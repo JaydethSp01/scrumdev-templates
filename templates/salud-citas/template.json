@@ -1,0 +1,29 @@
+{
+  "id": "salud-citas",
+  "name": "CliniCitas",
+  "sector": "salud",
+  "sector_label": "Salud / Citas",
+  "software_type": "saas_crud",
+  "stack": "nextjs-fastapi-postgres",
+  "description": "Agenda de citas médicas: pacientes, profesionales, horarios y recordatorios.",
+  "entities": [
+    "paciente",
+    "cita",
+    "profesional",
+    "especialidad"
+  ],
+  "brand_color": "#0d9488",
+  "tags": [
+    "clinica",
+    "citas",
+    "medico",
+    "agenda",
+    "pacientes",
+    "salud",
+    "consultorio"
+  ],
+  "accent": "",
+  "has_files": false,
+  "preview_url": "https://raw.githubusercontent.com/JaydethSp01/scrumdev-templates/main/templates/salud-citas/preview.png",
+  "seeded_at": "2026-06-01"
+}
