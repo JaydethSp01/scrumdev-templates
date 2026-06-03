@@ -1,52 +1,71 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useRouter } from 'next/router';
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Plus, Pencil, Trash2 } from "lucide-react";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Card } from "@/components/ui/Card";
+import { DataTable } from "@/components/ui/DataTable";
+import { Avatar } from "@/components/ui/Avatar";
+import { Button } from "@/components/ui/Button";
 
-const EspecialidadPage = () => {
-  const [especialidades, setEspecialidades] = useState([]);
-  const router = useRouter();
-
-  useEffect(() => {
-    const fetchEspecialidades = async () => {
-      try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/especialidades`);
-        setEspecialidades(response.data);
-      } catch (error) {
-        console.error('Error fetching especialidades:', error);
-      }
-    };
-    fetchEspecialidades();
-  }, []);
-
-  const handleAddEspecialidad = () => {
-    router.push('/especialidad/create');
-  };
-
-  return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Especialidades</h1>
-      <button onClick={handleAddEspecialidad} className="bg-blue-500 text-white px-4 py-2 rounded mb-4">Agregar Especialidad</button>
-      <table className="min-w-full bg-white">
-        <thead>
-          <tr>
-            <th className="py-2">Nombre</th>
-            <th className="py-2">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {especialidades.map((especialidad) => (
-            <tr key={especialidad.id} className="text-center">
-              <td className="py-2">{especialidad.nombre}</td>
-              <td className="py-2">
-                <button className="bg-green-500 text-white px-2 py-1 rounded mr-2">Editar</button>
-                <button className="bg-red-500 text-white px-2 py-1 rounded">Eliminar</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+type Especialidad = {
+  nombre: string;
+  profesionales: number;
+  citasMes: number;
 };
 
-export default EspecialidadPage;
+const MOCK: Especialidad[] = [
+  { nombre: "Cardiología", profesionales: 4, citasMes: 312 },
+  { nombre: "Pediatría", profesionales: 6, citasMes: 248 },
+  { nombre: "Dermatología", profesionales: 3, citasMes: 187 },
+  { nombre: "Neurología", profesionales: 2, citasMes: 96 },
+  { nombre: "Ginecología", profesionales: 3, citasMes: 154 },
+];
+
+export default function Page() {
+  const router = useRouter();
+  const [rows] = useState<Especialidad[]>(MOCK);
+
+  const columns = [
+    {
+      key: "nombre",
+      header: "Especialidad",
+      render: (r: Especialidad) => (
+        <div className="flex items-center gap-3">
+          <Avatar name={r.nombre} />
+          <span className="font-medium text-slate-900">{r.nombre}</span>
+        </div>
+      ),
+    },
+    { key: "profesionales", header: "Profesionales", render: (r: Especialidad) => <span className="text-slate-600">{r.profesionales}</span> },
+    { key: "citasMes", header: "Citas / mes", render: (r: Especialidad) => <span className="text-slate-600">{r.citasMes}</span> },
+    {
+      key: "acciones",
+      header: "Acciones",
+      align: "right" as const,
+      render: () => (
+        <div className="flex justify-end gap-1">
+          <Button variant="ghost" className="cursor-pointer !px-2.5"><Pencil size={15} /> Editar</Button>
+          <Button variant="danger" className="cursor-pointer !px-2.5"><Trash2 size={15} /> Eliminar</Button>
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <PageHeader
+        title="Especialidades"
+        subtitle="Áreas médicas disponibles y su volumen de consulta."
+        action={
+          <Button className="cursor-pointer" onClick={() => router.push("/especialidad/create")}>
+            <Plus size={16} /> Nueva especialidad
+          </Button>
+        }
+      />
+      <Card className="!p-0">
+        <DataTable columns={columns} rows={rows} empty="Aún no hay especialidades registradas." />
+      </Card>
+    </div>
+  );
+}

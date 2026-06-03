@@ -1,50 +1,86 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Plus, Pencil, Trash2 } from "lucide-react";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Card } from "@/components/ui/Card";
+import { DataTable } from "@/components/ui/DataTable";
+import { Badge } from "@/components/ui/Badge";
+import { Avatar } from "@/components/ui/Avatar";
+import { Button } from "@/components/ui/Button";
 
-const ContactosPage = () => {
-  const [contactos, setContactos] = useState([]);
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || '/api/mock/contactos';
-
-  useEffect(() => {
-    const fetchContactos = async () => {
-      try {
-        const response = await axios.get(`${apiUrl}/contactos`);
-        setContactos(response.data);
-      } catch (error) {
-        console.error('Error fetching contactos:', error);
-      }
-    };
-    fetchContactos();
-  }, [apiUrl]);
-
-  return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Contactos</h1>
-      <table className="min-w-full bg-white">
-        <thead>
-          <tr>
-            <th className="py-2">ID</th>
-            <th className="py-2">Nombre</th>
-            <th className="py-2">Teléfono</th>
-            <th className="py-2">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {contactos.map((contacto) => (
-            <tr key={contacto.id} className="border-t">
-              <td className="py-2">{contacto.id}</td>
-              <td className="py-2">{contacto.name}</td>
-              <td className="py-2">{contacto.phone}</td>
-              <td className="py-2">
-                <button className="bg-blue-500 text-white px-2 py-1 rounded">Editar</button>
-                <button className="bg-red-500 text-white px-2 py-1 rounded ml-2">Eliminar</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+type Contacto = {
+  id: number;
+  nombre: string;
+  empresa: string;
+  cargo: string;
+  telefono: string;
+  tipo: string;
 };
 
-export default ContactosPage;
+const MOCK: Contacto[] = [
+  { id: 1, nombre: "Carlos Ruiz", empresa: "TechCorp", cargo: "CTO", telefono: "+57 300 111 2233", tipo: "Cliente" },
+  { id: 2, nombre: "Elena Ríos", empresa: "SoftSolutions", cargo: "Gerente de TI", telefono: "+57 311 444 5566", tipo: "Cliente" },
+  { id: 3, nombre: "Juan Pérez", empresa: "Innova Labs", cargo: "Fundador", telefono: "+57 320 777 8899", tipo: "Prospecto" },
+  { id: 4, nombre: "Ana Gómez", empresa: "DataBridge", cargo: "Directora", telefono: "+57 301 222 3344", tipo: "Prospecto" },
+  { id: 5, nombre: "Sofía Vargas", empresa: "Orbit", cargo: "COO", telefono: "+57 315 555 6677", tipo: "Cliente" },
+];
+
+const tone = (t: string) => (t === "Cliente" ? "success" : "info");
+
+export default function ContactosPage() {
+  const [data] = useState(MOCK);
+  const router = useRouter();
+
+  return (
+    <div className="space-y-6">
+      <PageHeader
+        title="Contactos"
+        subtitle="Personas con las que mantienes relación comercial."
+        action={
+          <Button className="cursor-pointer" onClick={() => router.push("/contactos/create")}>
+            <Plus size={16} /> Nuevo contacto
+          </Button>
+        }
+      />
+
+      <Card className="!p-0">
+        <DataTable<Contacto>
+          rows={data}
+          columns={[
+            {
+              key: "nombre",
+              header: "Contacto",
+              render: (r) => (
+                <div className="flex items-center gap-3">
+                  <Avatar name={r.nombre} />
+                  <div>
+                    <p className="font-medium text-slate-900">{r.nombre}</p>
+                    <p className="text-xs text-slate-500">{r.cargo} · {r.empresa}</p>
+                  </div>
+                </div>
+              ),
+            },
+            { key: "telefono", header: "Teléfono" },
+            { key: "tipo", header: "Tipo", render: (r) => <Badge tone={tone(r.tipo)}>{r.tipo}</Badge> },
+            {
+              key: "acciones",
+              header: "Acciones",
+              align: "right",
+              render: () => (
+                <div className="flex justify-end gap-2">
+                  <Button variant="ghost" className="cursor-pointer">
+                    <Pencil size={15} /> Editar
+                  </Button>
+                  <Button variant="danger" className="cursor-pointer">
+                    <Trash2 size={15} /> Eliminar
+                  </Button>
+                </div>
+              ),
+            },
+          ]}
+        />
+      </Card>
+    </div>
+  );
+}

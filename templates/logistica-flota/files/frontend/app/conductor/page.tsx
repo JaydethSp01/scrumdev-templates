@@ -1,58 +1,63 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Plus, Pencil, Trash2 } from "lucide-react";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Card } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { Avatar } from "@/components/ui/Avatar";
+import { Button } from "@/components/ui/Button";
+import { DataTable } from "@/components/ui/DataTable";
 
-const ConductorPage = () => {
-  const [conductores, setConductores] = useState([]);
-  const [form, setForm] = useState({
-    nombre: '',
-    licencia: ''
-  });
+type Conductor = { nombre: string; licencia: string; zona: string; estado: string };
 
-  useEffect(() => {
-    fetchConductores();
-  }, []);
+const MOCK: Conductor[] = [
+  { nombre: "Juan Pérez", licencia: "B1234567", zona: "Zona Norte", estado: "En ruta" },
+  { nombre: "María López", licencia: "C2345678", zona: "Eje Cafetero", estado: "En ruta" },
+  { nombre: "Carlos García", licencia: "C3456789", zona: "Costa Caribe", estado: "Disponible" },
+  { nombre: "Ana Martínez", licencia: "B4567890", zona: "Zona Oriente", estado: "Disponible" },
+  { nombre: "Diego Torres", licencia: "C5678901", zona: "Zona Sur", estado: "Descanso" },
+  { nombre: "Laura Niño", licencia: "B6789012", zona: "Zona Andina", estado: "En ruta" },
+];
 
-  const fetchConductores = async () => {
-    try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/conductor`);
-      setConductores(response.data);
-    } catch (error) {
-      console.error('Error fetching conductores:', error);
-    }
-  };
+const tone = (e: string) => (e === "Disponible" ? "success" : e === "En ruta" ? "info" : "warning");
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
-  };
+export default function ConductorPage() {
+  const router = useRouter();
+  const [rows] = useState(MOCK);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/conductor`, form);
-      fetchConductores();
-    } catch (error) {
-      console.error('Error creating conductor:', error);
-    }
-  };
+  const columns = [
+    { key: "nombre", header: "Conductor", render: (r: Conductor) => (
+      <div className="flex items-center gap-3">
+        <Avatar name={r.nombre} />
+        <div>
+          <p className="font-medium text-slate-900">{r.nombre}</p>
+          <p className="text-xs text-slate-500">{r.zona}</p>
+        </div>
+      </div>
+    ) },
+    { key: "licencia", header: "Licencia", render: (r: Conductor) => (
+      <span className="font-mono text-slate-700">{r.licencia}</span>
+    ) },
+    { key: "estado", header: "Estado", render: (r: Conductor) => <Badge tone={tone(r.estado)}>{r.estado}</Badge> },
+    { key: "acciones", header: "", align: "right" as const, render: () => (
+      <div className="flex justify-end gap-1">
+        <Button variant="ghost" className="cursor-pointer !px-2"><Pencil size={16} /></Button>
+        <Button variant="ghost" className="cursor-pointer !px-2 text-rose-600"><Trash2 size={16} /></Button>
+      </div>
+    ) },
+  ];
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Gestión de Conductores</h1>
-      <form onSubmit={handleSubmit} className="mb-4">
-        <input type="text" name="nombre" placeholder="Nombre" value={form.nombre} onChange={handleInputChange} className="border p-2 mr-2" />
-        <input type="text" name="licencia" placeholder="Licencia" value={form.licencia} onChange={handleInputChange} className="border p-2" />
-        <button type="submit" className="bg-blue-500 text-white p-2">Crear</button>
-      </form>
-      <ul>
-        {conductores.map((conductor) => (
-          <li key={conductor.id} className="p-2 border-b">
-            {conductor.nombre} - {conductor.licencia}
-          </li>
-        ))}
-      </ul>
+    <div className="space-y-6">
+      <PageHeader
+        title="Conductores"
+        subtitle="Administra el equipo de conductores y su disponibilidad."
+        action={<Button className="cursor-pointer" onClick={() => router.push("/conductor/create")}><Plus size={16} /> Nuevo conductor</Button>}
+      />
+      <Card className="!p-0">
+        <DataTable columns={columns} rows={rows} empty="Sin conductores registrados." />
+      </Card>
     </div>
   );
-};
-
-export default ConductorPage;
+}

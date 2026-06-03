@@ -1,50 +1,66 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Plus } from "lucide-react";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Card } from "@/components/ui/Card";
+import { DataTable } from "@/components/ui/DataTable";
+import { Badge } from "@/components/ui/Badge";
+import { Avatar } from "@/components/ui/Avatar";
+import { Button } from "@/components/ui/Button";
 
-const StockPage = () => {
-  const [stocks, setStocks] = useState([]);
+const MOCK = [
+  { id: 1, producto: "Zapatilla Runner Pro", talla: "42", cantidad: 0, estado: "Agotado" },
+  { id: 2, producto: "Camiseta Oversize Negra", talla: "L", cantidad: 6, estado: "Stock bajo" },
+  { id: 3, producto: "Mochila Urban 24L", talla: "Única", cantidad: 4, estado: "Stock bajo" },
+  { id: 4, producto: "Gorra Trucker Índigo", talla: "Única", cantidad: 87, estado: "En stock" },
+  { id: 5, producto: "Pantalón Cargo Slim", talla: "M", cantidad: 132, estado: "En stock" },
+  { id: 6, producto: "Sudadera Tech Fleece", talla: "XL", cantidad: 41, estado: "En stock" },
+];
 
-  useEffect(() => {
-    const fetchStocks = async () => {
-      try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || '/api/mock'}/stock`);
-        setStocks(response.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
+const tone = (e: string) => (e === "En stock" ? "success" : e === "Stock bajo" ? "warning" : "danger");
 
-    fetchStocks();
-  }, []);
+export default function Page() {
+  const router = useRouter();
+  const [rows] = useState(MOCK);
+
+  const columns = [
+    {
+      key: "producto",
+      header: "Producto",
+      render: (r: any) => (
+        <div className="flex items-center gap-3">
+          <Avatar name={r.producto} />
+          <span className="font-medium text-slate-900">{r.producto}</span>
+        </div>
+      ),
+    },
+    { key: "talla", header: "Talla", render: (r: any) => <Badge tone="info">{r.talla}</Badge> },
+    { key: "cantidad", header: "Cantidad", align: "right" as const, render: (r: any) => <span className="font-medium text-slate-900">{r.cantidad} uds</span> },
+    { key: "estado", header: "Estado", render: (r: any) => <Badge tone={tone(r.estado)}>{r.estado}</Badge> },
+    {
+      key: "acciones",
+      header: "",
+      align: "right" as const,
+      render: () => (
+        <div className="flex justify-end gap-2">
+          <Button variant="ghost" className="cursor-pointer">Editar</Button>
+          <Button variant="danger" className="cursor-pointer">Eliminar</Button>
+        </div>
+      ),
+    },
+  ];
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Stock</h1>
-      <table className="min-w-full bg-white">
-        <thead>
-          <tr>
-            <th className="w-1/4 px-4 py-2">Producto</th>
-            <th className="w-1/4 px-4 py-2">Talla</th>
-            <th className="w-1/4 px-4 py-2">Cantidad</th>
-            <th className="w-1/4 px-4 py-2">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {stocks.map((stock) => (
-            <tr key={stock.id}>
-              <td className="border px-4 py-2">{stock.producto}</td>
-              <td className="border px-4 py-2">{stock.talla}</td>
-              <td className="border px-4 py-2">{stock.cantidad}</td>
-              <td className="border px-4 py-2">
-                <button className="bg-blue-500 text-white px-2 py-1 rounded">Editar</button>
-                <button className="bg-red-500 text-white px-2 py-1 rounded ml-2">Eliminar</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="space-y-6">
+      <PageHeader
+        title="Stock"
+        subtitle="Existencias por producto y talla"
+        action={<Button variant="primary" className="cursor-pointer" onClick={() => router.push("/stock/create")}><Plus size={16} /> Ajustar stock</Button>}
+      />
+      <Card className="!p-0">
+        <DataTable columns={columns} rows={rows} />
+      </Card>
     </div>
   );
-};
-
-export default StockPage;
+}

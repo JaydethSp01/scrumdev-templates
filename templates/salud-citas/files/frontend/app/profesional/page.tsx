@@ -1,54 +1,72 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useRouter } from 'next/router';
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Plus, Pencil, Trash2 } from "lucide-react";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Card } from "@/components/ui/Card";
+import { DataTable } from "@/components/ui/DataTable";
+import { Avatar } from "@/components/ui/Avatar";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 
-const ProfesionalPage = () => {
-  const [profesionales, setProfesionales] = useState([]);
-  const router = useRouter();
-
-  useEffect(() => {
-    const fetchProfesionales = async () => {
-      try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/profesionales`);
-        setProfesionales(response.data);
-      } catch (error) {
-        console.error('Error fetching profesionales:', error);
-      }
-    };
-    fetchProfesionales();
-  }, []);
-
-  const handleAddProfesional = () => {
-    router.push('/profesional/create');
-  };
-
-  return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Profesionales</h1>
-      <button onClick={handleAddProfesional} className="bg-blue-500 text-white px-4 py-2 rounded mb-4">Agregar Profesional</button>
-      <table className="min-w-full bg-white">
-        <thead>
-          <tr>
-            <th className="py-2">Nombre</th>
-            <th className="py-2">Especialidad</th>
-            <th className="py-2">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {profesionales.map((profesional) => (
-            <tr key={profesional.id} className="text-center">
-              <td className="py-2">{profesional.nombre}</td>
-              <td className="py-2">{profesional.especialidad}</td>
-              <td className="py-2">
-                <button className="bg-green-500 text-white px-2 py-1 rounded mr-2">Editar</button>
-                <button className="bg-red-500 text-white px-2 py-1 rounded">Eliminar</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+type Profesional = {
+  nombre: string;
+  especialidad: string;
+  pacientes: number;
 };
 
-export default ProfesionalPage;
+const MOCK: Profesional[] = [
+  { nombre: "Dra. Rodríguez", especialidad: "Cardiología", pacientes: 142 },
+  { nombre: "Dr. Fernández", especialidad: "Dermatología", pacientes: 98 },
+  { nombre: "Dra. López", especialidad: "Neurología", pacientes: 76 },
+  { nombre: "Dr. Gómez", especialidad: "Pediatría", pacientes: 165 },
+  { nombre: "Dra. Torres", especialidad: "Ginecología", pacientes: 121 },
+];
+
+export default function Page() {
+  const router = useRouter();
+  const [rows] = useState<Profesional[]>(MOCK);
+
+  const columns = [
+    {
+      key: "nombre",
+      header: "Profesional",
+      render: (r: Profesional) => (
+        <div className="flex items-center gap-3">
+          <Avatar name={r.nombre} />
+          <span className="font-medium text-slate-900">{r.nombre}</span>
+        </div>
+      ),
+    },
+    { key: "especialidad", header: "Especialidad", render: (r: Profesional) => <Badge tone="brand">{r.especialidad}</Badge> },
+    { key: "pacientes", header: "Pacientes", render: (r: Profesional) => <span className="text-slate-600">{r.pacientes}</span> },
+    {
+      key: "acciones",
+      header: "Acciones",
+      align: "right" as const,
+      render: () => (
+        <div className="flex justify-end gap-1">
+          <Button variant="ghost" className="cursor-pointer !px-2.5"><Pencil size={15} /> Editar</Button>
+          <Button variant="danger" className="cursor-pointer !px-2.5"><Trash2 size={15} /> Eliminar</Button>
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <PageHeader
+        title="Profesionales"
+        subtitle="Equipo médico, sus especialidades y carga de pacientes."
+        action={
+          <Button className="cursor-pointer" onClick={() => router.push("/profesional/create")}>
+            <Plus size={16} /> Nuevo profesional
+          </Button>
+        }
+      />
+      <Card className="!p-0">
+        <DataTable columns={columns} rows={rows} empty="Aún no hay profesionales registrados." />
+      </Card>
+    </div>
+  );
+}

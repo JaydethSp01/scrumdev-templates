@@ -1,62 +1,67 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Plus, Pencil, Trash2 } from "lucide-react";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Card } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { Avatar } from "@/components/ui/Avatar";
+import { Button } from "@/components/ui/Button";
+import { DataTable } from "@/components/ui/DataTable";
 
-const EnvioPage = () => {
-  const [envios, setEnvios] = useState([]);
-  const [form, setForm] = useState({
-    descripcion: '',
-    destino: '',
-    conductorId: '',
-    vehiculoId: ''
-  });
+type Envio = { guia: string; descripcion: string; destino: string; conductor: string; estado: string };
 
-  useEffect(() => {
-    fetchEnvios();
-  }, []);
+const MOCK: Envio[] = [
+  { guia: "GU-4821", descripcion: "Electrodomésticos", destino: "Medellín", conductor: "Juan Pérez", estado: "Entregado" },
+  { guia: "GU-4822", descripcion: "Textiles", destino: "Pereira", conductor: "María López", estado: "En tránsito" },
+  { guia: "GU-4823", descripcion: "Insumos médicos", destino: "Cartagena", conductor: "Carlos García", estado: "Retrasado" },
+  { guia: "GU-4824", descripcion: "Repuestos", destino: "Bucaramanga", conductor: "Ana Martínez", estado: "En tránsito" },
+  { guia: "GU-4825", descripcion: "Alimentos secos", destino: "Manizales", conductor: "Diego Torres", estado: "Cancelado" },
+  { guia: "GU-4826", descripcion: "Mobiliario", destino: "Popayán", conductor: "Laura Niño", estado: "Entregado" },
+];
 
-  const fetchEnvios = async () => {
-    try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/envio`);
-      setEnvios(response.data);
-    } catch (error) {
-      console.error('Error fetching envios:', error);
-    }
-  };
+const tone = (e: string) =>
+  e === "Entregado" ? "success" : e === "En tránsito" ? "info" : e === "Retrasado" ? "warning" : "danger";
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
-  };
+export default function EnvioPage() {
+  const router = useRouter();
+  const [rows] = useState(MOCK);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/envio`, form);
-      fetchEnvios();
-    } catch (error) {
-      console.error('Error creating envio:', error);
-    }
-  };
+  const columns = [
+    { key: "guia", header: "Guía", render: (r: Envio) => (
+      <span className="font-mono text-slate-700">{r.guia}</span>
+    ) },
+    { key: "descripcion", header: "Envío", render: (r: Envio) => (
+      <div>
+        <p className="font-medium text-slate-900">{r.descripcion}</p>
+        <p className="text-xs text-slate-500">Destino: {r.destino}</p>
+      </div>
+    ) },
+    { key: "conductor", header: "Conductor", render: (r: Envio) => (
+      <div className="flex items-center gap-2">
+        <Avatar name={r.conductor} />
+        <span className="text-slate-700">{r.conductor}</span>
+      </div>
+    ) },
+    { key: "estado", header: "Estado", render: (r: Envio) => <Badge tone={tone(r.estado)}>{r.estado}</Badge> },
+    { key: "acciones", header: "", align: "right" as const, render: () => (
+      <div className="flex justify-end gap-1">
+        <Button variant="ghost" className="cursor-pointer !px-2"><Pencil size={16} /></Button>
+        <Button variant="ghost" className="cursor-pointer !px-2 text-rose-600"><Trash2 size={16} /></Button>
+      </div>
+    ) },
+  ];
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Gestión de Envíos</h1>
-      <form onSubmit={handleSubmit} className="mb-4">
-        <input type="text" name="descripcion" placeholder="Descripción" value={form.descripcion} onChange={handleInputChange} className="border p-2 mr-2" />
-        <input type="text" name="destino" placeholder="Destino" value={form.destino} onChange={handleInputChange} className="border p-2 mr-2" />
-        <input type="text" name="conductorId" placeholder="ID Conductor" value={form.conductorId} onChange={handleInputChange} className="border p-2 mr-2" />
-        <input type="text" name="vehiculoId" placeholder="ID Vehículo" value={form.vehiculoId} onChange={handleInputChange} className="border p-2" />
-        <button type="submit" className="bg-blue-500 text-white p-2">Crear</button>
-      </form>
-      <ul>
-        {envios.map((envio) => (
-          <li key={envio.id} className="p-2 border-b">
-            {envio.descripcion} - Destino: {envio.destino}, Conductor ID: {envio.conductorId}, Vehículo ID: {envio.vehiculoId}
-          </li>
-        ))}
-      </ul>
+    <div className="space-y-6">
+      <PageHeader
+        title="Envíos"
+        subtitle="Controla el estado y la trazabilidad de cada despacho."
+        action={<Button className="cursor-pointer" onClick={() => router.push("/envio/create")}><Plus size={16} /> Nuevo envío</Button>}
+      />
+      <Card className="!p-0">
+        <DataTable columns={columns} rows={rows} empty="Sin envíos registrados." />
+      </Card>
     </div>
   );
-};
-
-export default EnvioPage;
+}

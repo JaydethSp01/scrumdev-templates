@@ -1,60 +1,85 @@
 "use client";
-import { useState } from 'react';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Plus } from "lucide-react";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Card } from "@/components/ui/Card";
+import { DataTable, type Column } from "@/components/ui/DataTable";
+import { Badge } from "@/components/ui/Badge";
+import { Avatar } from "@/components/ui/Avatar";
+import { Button } from "@/components/ui/Button";
 
-const MOCK_CARRITO = {
-  productos: [
-    { id: 1, nombre: 'Camiseta básica', precio: 25, imagen: 'https://via.placeholder.com/150' },
-    { id: 2, nombre: 'Pantalones vaqueros', precio: 40, imagen: 'https://via.placeholder.com/150' },
-    { id: 3, nombre: 'Zapatillas deportivas', precio: 60, imagen: 'https://via.placeholder.com/150' },
-    { id: 4, nombre: 'Chaqueta de cuero', precio: 120, imagen: 'https://via.placeholder.com/150' }
-  ],
-  total: 245
+type Item = {
+  producto: string;
+  talla: string;
+  cantidad: number;
+  precio: number;
+  estado: "En carrito" | "Reservado";
 };
 
+const MOCK: Item[] = [
+  { producto: "Vestido midi floral", talla: "M", cantidad: 1, precio: 64.0, estado: "En carrito" },
+  { producto: "Botines de cuero", talla: "38", cantidad: 1, precio: 95.0, estado: "Reservado" },
+  { producto: "Bolso bandolera", talla: "Única", cantidad: 2, precio: 72.0, estado: "En carrito" },
+  { producto: "Blusa de seda", talla: "S", cantidad: 1, precio: 49.5, estado: "En carrito" },
+];
+
 export default function CarritoPage() {
-  const [carrito] = useState(MOCK_CARRITO);
+  const router = useRouter();
+  const [rows] = useState(MOCK);
+  const total = rows.reduce((acc, r) => acc + r.precio * r.cantidad, 0);
+
+  const columns: Column<Item>[] = [
+    {
+      key: "producto",
+      header: "Producto",
+      render: (r) => (
+        <div className="flex items-center gap-3">
+          <Avatar name={r.producto} />
+          <div>
+            <p className="font-medium text-slate-900">{r.producto}</p>
+            <p className="text-xs text-slate-500">Talla {r.talla}</p>
+          </div>
+        </div>
+      ),
+    },
+    { key: "cantidad", header: "Cant.", align: "right", render: (r) => <span className="text-slate-600">{r.cantidad}</span> },
+    { key: "precio", header: "Precio", align: "right", render: (r) => <span className="font-semibold text-slate-900">${r.precio.toFixed(2)}</span> },
+    { key: "estado", header: "Estado", render: (r) => <Badge tone={r.estado === "Reservado" ? "info" : "warning"}>{r.estado}</Badge> },
+    {
+      key: "acciones",
+      header: "",
+      align: "right",
+      render: () => (
+        <div className="flex justify-end gap-1">
+          <Button variant="ghost" className="cursor-pointer">Editar</Button>
+          <Button variant="danger" className="cursor-pointer">Eliminar</Button>
+        </div>
+      ),
+    },
+  ];
 
   return (
-    <div className="p-8 space-y-8">
-      <header>
-        <h1 className="text-3xl font-bold tracking-tight">Carrito de Compras</h1>
-        <p className="text-neutral-500 mt-1">Revisa los productos en tu carrito</p>
-      </header>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {carrito.productos.map((producto) => (
-          <div key={producto.id} className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
-            <img src={producto.imagen} alt={producto.nombre} className="w-full h-32 object-cover rounded-t-2xl" />
-            <div className="mt-4">
-              <p className="text-lg font-semibold">{producto.nombre}</p>
-              <p className="text-sm text-neutral-500 mt-1">${producto.precio}</p>
-            </div>
+    <div className="space-y-6">
+      <PageHeader
+        title="Carrito"
+        subtitle="Ítems en proceso de compra."
+        action={
+          <Button className="cursor-pointer" onClick={() => router.push("/carrito/create")}>
+            <Plus size={16} /> Nuevo
+          </Button>
+        }
+      />
+      <Card className="!p-0">
+        <DataTable columns={columns} rows={rows} empty="El carrito está vacío." />
+      </Card>
+      <div className="flex justify-end">
+        <Card className="w-full max-w-xs">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-slate-500">Total estimado</span>
+            <span className="text-2xl font-bold tracking-tight text-slate-900">${total.toFixed(2)}</span>
           </div>
-        ))}
-      </div>
-      <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
-        <h2 className="font-semibold mb-4">Resumen del Carrito</h2>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-left text-neutral-500">
-              <th className="py-2">Producto</th>
-              <th className="py-2">Precio</th>
-            </tr>
-          </thead>
-          <tbody>
-            {carrito.productos.map((producto) => (
-              <tr key={producto.id} className="border-t border-neutral-100 dark:border-neutral-800">
-                <td className="py-3">{producto.nombre}</td>
-                <td className="py-3">${producto.precio}</td>
-              </tr>
-            ))}
-          </tbody>
-          <tfoot>
-            <tr className="border-t border-neutral-200 dark:border-neutral-800">
-              <td className="py-3 font-semibold">Total</td>
-              <td className="py-3 font-semibold">${carrito.total}</td>
-            </tr>
-          </tfoot>
-        </table>
+        </Card>
       </div>
     </div>
   );

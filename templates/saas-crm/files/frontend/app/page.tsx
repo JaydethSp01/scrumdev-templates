@@ -1,64 +1,109 @@
 "use client";
-import { useState } from 'react';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Users, Target, DollarSign, TrendingUp, Plus } from "lucide-react";
+import { Hero } from "@/components/ui/Hero";
+import { StatCard } from "@/components/ui/StatCard";
+import { ChartCard } from "@/components/ui/ChartCard";
+import { Card } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { Avatar } from "@/components/ui/Avatar";
+import { Button } from "@/components/ui/Button";
 
-const MOCK_DATA = {
-  leads: [
-    { id: 1, nombre: 'Juan Pérez', email: 'juanperez@example.com', estado: 'Nuevo' },
-    { id: 2, nombre: 'Ana Gómez', email: 'anagomez@example.com', estado: 'Contactado' },
-    { id: 3, nombre: 'Luis Martínez', email: 'luismartinez@example.com', estado: 'Calificado' },
-    { id: 4, nombre: 'Maria López', email: 'marialopez@example.com', estado: 'Perdido' },
+const MOCK = {
+  stats: [
+    { label: "Leads", value: 248, icon: <Users size={20} />, trend: { value: "14%", positive: true } },
+    { label: "Oportunidades", value: 32, icon: <Target size={20} />, trend: { value: "9%", positive: true } },
+    { label: "MRR", value: "$42.8k", icon: <DollarSign size={20} />, trend: { value: "6%", positive: true } },
+    { label: "Conversión", value: "24%", icon: <TrendingUp size={20} />, trend: { value: "2%", positive: false } },
   ],
-  oportunidades: [
-    { id: 1, nombre: 'Oportunidad A', etapa: 'Prospecto', valor: 5000 },
-    { id: 2, nombre: 'Oportunidad B', etapa: 'Negociación', valor: 15000 },
+  pipeline: [
+    { label: "Ene", value: 22000 }, { label: "Feb", value: 28000 }, { label: "Mar", value: 25000 },
+    { label: "Abr", value: 34000 }, { label: "May", value: 39000 }, { label: "Jun", value: 42800 }, { label: "Jul", value: 47000 },
   ],
-  contactos: [
-    { id: 1, nombre: 'Carlos Ruiz', empresa: 'TechCorp' },
-    { id: 2, nombre: 'Elena Ríos', empresa: 'SoftSolutions' },
+  etapas: [
+    { n: "Prospecto", p: 34 }, { n: "Calificado", p: 26 },
+    { n: "Negociación", p: 22 }, { n: "Cierre", p: 18 },
+  ],
+  deals: [
+    { contacto: "Carlos Ruiz", empresa: "TechCorp", etapa: "Ganado", monto: 18500 },
+    { contacto: "Elena Ríos", empresa: "SoftSolutions", etapa: "Negociación", monto: 24000 },
+    { contacto: "Juan Pérez", empresa: "Innova Labs", etapa: "Nuevo", monto: 6800 },
+    { contacto: "Ana Gómez", empresa: "DataBridge", etapa: "Negociación", monto: 15200 },
+    { contacto: "Luis Martínez", empresa: "Cloudly", etapa: "Perdido", monto: 4300 },
   ],
 };
 
+const tone = (e: string) =>
+  e === "Ganado" ? "success" : e === "Negociación" ? "info" : e === "Nuevo" ? "warning" : "danger";
+
+const money = (n: number) => `$${n.toLocaleString("es-CO")}`;
+
 export default function CRMPage() {
-  const [data] = useState(MOCK_DATA);
+  const [data] = useState(MOCK);
+  const router = useRouter();
 
   return (
-    <div className="p-8 space-y-8">
-      <header>
-        <h1 className="text-3xl font-bold tracking-tight">CRM de Ventas</h1>
-        <p className="text-neutral-500 mt-1">Gestión de leads, oportunidades y contactos</p>
-      </header>
+    <div className="space-y-6">
+      <Hero
+        title="Buenos días, equipo Ventas"
+        subtitle="Tienes 32 oportunidades abiertas y un MRR de $42.8k este mes — el pipeline crece 14%."
+        action={
+          <Button
+            variant="secondary"
+            className="!bg-white !text-brand cursor-pointer"
+            onClick={() => router.push("/oportunidades/create")}
+          >
+            <Plus size={16} /> Nueva oportunidad
+          </Button>
+        }
+      />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {data.oportunidades.map((op) => (
-          <div key={op.id} className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
-            <h3 className="text-lg font-semibold">{op.nombre}</h3>
-            <p className="text-sm text-neutral-500">Etapa: {op.etapa}</p>
-            <p className="text-xl font-bold mt-1">${op.valor}</p>
-          </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {data.stats.map((s) => (
+          <StatCard key={s.label} label={s.label} value={s.value} icon={s.icon} trend={s.trend} />
         ))}
       </div>
 
-      <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
-        <h2 className="font-semibold mb-4">Leads</h2>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-left text-neutral-500">
-              <th className="py-2">Nombre</th>
-              <th className="py-2">Email</th>
-              <th className="py-2">Estado</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.leads.map((lead) => (
-              <tr key={lead.id} className="border-t border-neutral-100 dark:border-neutral-800">
-                <td className="py-3">{lead.nombre}</td>
-                <td className="py-3">{lead.email}</td>
-                <td className="py-3">{lead.estado}</td>
-              </tr>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <ChartCard className="lg:col-span-2" title="Pipeline por mes" subtitle="Valor del pipeline (USD)" data={data.pipeline} />
+        <Card>
+          <h3 className="mb-4 text-base font-semibold text-slate-900">Por etapa del embudo</h3>
+          <div className="space-y-3">
+            {data.etapas.map((e) => (
+              <div key={e.n}>
+                <div className="mb-1 flex justify-between text-sm">
+                  <span className="font-medium text-slate-700">{e.n}</span>
+                  <span className="text-slate-500">{e.p}%</span>
+                </div>
+                <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+                  <div className="h-full rounded-full bg-brand" style={{ width: `${e.p}%` }} />
+                </div>
+              </div>
             ))}
-          </tbody>
-        </table>
+          </div>
+        </Card>
       </div>
+
+      <Card className="!p-0">
+        <div className="flex items-center justify-between border-b border-slate-100 p-5">
+          <h3 className="text-base font-semibold text-slate-900">Deals recientes</h3>
+          <Badge tone="brand">{data.deals.length} activos</Badge>
+        </div>
+        <ul className="divide-y divide-slate-100">
+          {data.deals.map((d, i) => (
+            <li key={i} className="flex items-center gap-4 p-5">
+              <Avatar name={d.contacto} />
+              <div className="min-w-0 flex-1">
+                <p className="font-medium text-slate-900">{d.contacto}</p>
+                <p className="truncate text-sm text-slate-500">{d.empresa}</p>
+              </div>
+              <span className="hidden text-sm font-semibold text-slate-700 sm:block">{money(d.monto)}</span>
+              <Badge tone={tone(d.etapa)}>{d.etapa}</Badge>
+            </li>
+          ))}
+        </ul>
+      </Card>
     </div>
   );
 }

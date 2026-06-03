@@ -1,50 +1,93 @@
 "use client";
 import { useState } from "react";
+import { CalendarCheck, Users, Stethoscope, Activity, Plus } from "lucide-react";
+import { Hero } from "@/components/ui/Hero";
+import { StatCard } from "@/components/ui/StatCard";
+import { ChartCard } from "@/components/ui/ChartCard";
+import { Card } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { Avatar } from "@/components/ui/Avatar";
+import { Button } from "@/components/ui/Button";
 
-const MOCK_DATA = {
-  pacientes: [
-    { id: 1, nombre: "Juan Pérez", edad: 30 },
-    { id: 2, nombre: "Ana Gómez", edad: 25 },
-    { id: 3, nombre: "Carlos Ruiz", edad: 40 },
-    { id: 4, nombre: "Laura Martínez", edad: 35 },
+const MOCK = {
+  stats: [
+    { label: "Citas hoy", value: 24, icon: <CalendarCheck size={20} />, trend: { value: "12%", positive: true } },
+    { label: "Pacientes", value: 1280, icon: <Users size={20} />, trend: { value: "8%", positive: true } },
+    { label: "Profesionales", value: 18, icon: <Stethoscope size={20} /> },
+    { label: "Ocupación", value: "86%", icon: <Activity size={20} />, trend: { value: "3%", positive: false } },
+  ],
+  semana: [
+    { label: "Lun", value: 18 }, { label: "Mar", value: 24 }, { label: "Mié", value: 21 },
+    { label: "Jue", value: 30 }, { label: "Vie", value: 27 }, { label: "Sáb", value: 12 }, { label: "Dom", value: 6 },
   ],
   citas: [
-    { id: 1, paciente: "Juan Pérez", profesional: "Dra. Rodríguez", especialidad: "Cardiología", estado: "Confirmada" },
-    { id: 2, paciente: "Ana Gómez", profesional: "Dr. Fernández", especialidad: "Dermatología", estado: "Pendiente" },
-    { id: 3, paciente: "Carlos Ruiz", profesional: "Dra. López", especialidad: "Neurología", estado: "Cancelada" },
+    { paciente: "Juan Pérez", profesional: "Dra. Rodríguez", especialidad: "Cardiología", hora: "09:00", estado: "Confirmada" },
+    { paciente: "Ana Gómez", profesional: "Dr. Fernández", especialidad: "Dermatología", hora: "10:30", estado: "Pendiente" },
+    { paciente: "Carlos Ruiz", profesional: "Dra. López", especialidad: "Neurología", hora: "12:00", estado: "Cancelada" },
+    { paciente: "Laura Martínez", profesional: "Dr. Gómez", especialidad: "Pediatría", hora: "15:30", estado: "Confirmada" },
   ],
 };
 
-export default function Page() {
-  const [data] = useState(MOCK_DATA);
+const tone = (e: string) => (e === "Confirmada" ? "success" : e === "Pendiente" ? "warning" : "danger");
 
+export default function Page() {
+  const [data] = useState(MOCK);
   return (
-    <div className="p-8 space-y-8">
-      <header>
-        <h1 className="text-3xl font-bold tracking-tight">Sistema de Agenda de Citas</h1>
-        <p className="text-neutral-500 mt-1">Panel del día</p>
-      </header>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {data.citas.map((cita, index) => (
-          <div key={index} className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-lg dark:border-neutral-800 dark:bg-neutral-900">
-            <h2 className="text-xl font-semibold">{cita.paciente}</h2>
-            <p className="text-neutral-500">{cita.profesional}</p>
-            <p className="text-neutral-500">{cita.especialidad}</p>
-            <p className={`text-sm mt-1 ${cita.estado === "Confirmada" ? "text-green-500" : cita.estado === "Pendiente" ? "text-yellow-500" : "text-red-500"}`}>{cita.estado}</p>
-          </div>
+    <div className="space-y-6">
+      <Hero
+        title="Buenos días, equipo Vida"
+        subtitle="Tienes 24 citas hoy. La ocupación está al 86% — un día movido en consulta."
+        action={<Button variant="secondary" className="!bg-white !text-brand"><Plus size={16} /> Nueva cita</Button>}
+      />
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {data.stats.map((s) => (
+          <StatCard key={s.label} label={s.label} value={s.value} icon={s.icon} trend={s.trend} />
         ))}
       </div>
-      <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-lg dark:border-neutral-800 dark:bg-neutral-900">
-        <h2 className="font-semibold mb-4">Pacientes</h2>
-        <ul className="space-y-3">
-          {data.pacientes.map((paciente) => (
-            <li key={paciente.id} className="border-t border-neutral-100 dark:border-neutral-800 py-3">
-              <p className="font-medium">{paciente.nombre}</p>
-              <p className="text-neutral-500">Edad: {paciente.edad}</p>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <ChartCard className="lg:col-span-2" title="Citas por día" subtitle="Esta semana" data={data.semana} />
+        <Card>
+          <h3 className="mb-4 text-base font-semibold text-slate-900">Por especialidad</h3>
+          <div className="space-y-3">
+            {[
+              { n: "Cardiología", p: 38 }, { n: "Pediatría", p: 27 },
+              { n: "Dermatología", p: 21 }, { n: "Neurología", p: 14 },
+            ].map((e) => (
+              <div key={e.n}>
+                <div className="mb-1 flex justify-between text-sm">
+                  <span className="font-medium text-slate-700">{e.n}</span>
+                  <span className="text-slate-500">{e.p}%</span>
+                </div>
+                <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+                  <div className="h-full rounded-full bg-brand" style={{ width: `${e.p}%` }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+
+      <Card className="!p-0">
+        <div className="flex items-center justify-between border-b border-slate-100 p-5">
+          <h3 className="text-base font-semibold text-slate-900">Próximas citas</h3>
+          <Badge tone="brand">{data.citas.length} hoy</Badge>
+        </div>
+        <ul className="divide-y divide-slate-100">
+          {data.citas.map((c, i) => (
+            <li key={i} className="flex items-center gap-4 p-5">
+              <Avatar name={c.paciente} />
+              <div className="min-w-0 flex-1">
+                <p className="font-medium text-slate-900">{c.paciente}</p>
+                <p className="truncate text-sm text-slate-500">{c.profesional} · {c.especialidad}</p>
+              </div>
+              <span className="hidden text-sm font-medium text-slate-600 sm:block">{c.hora}</span>
+              <Badge tone={tone(c.estado)}>{c.estado}</Badge>
             </li>
           ))}
         </ul>
-      </div>
+      </Card>
     </div>
   );
 }

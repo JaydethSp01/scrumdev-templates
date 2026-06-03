@@ -1,35 +1,66 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Plus } from "lucide-react";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Card } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { Avatar } from "@/components/ui/Avatar";
+import { Button } from "@/components/ui/Button";
+import { DataTable } from "@/components/ui/DataTable";
 
-const MenPage = () => {
-  const [menuItems, setMenuItems] = useState([]);
+type Plato = { id: number; nombre: string; categoria: string; precio: number; estado: string };
 
-  useEffect(() => {
-    const fetchMenuItems = async () => {
-      try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/men`);
-        setMenuItems(response.data);
-      } catch (error) {
-        console.error('Error fetching menu items:', error);
-      }
-    };
-    fetchMenuItems();
-  }, []);
+const MOCK: Plato[] = [
+  { id: 1, nombre: "Pizza Margherita", categoria: "Pizzas", precio: 8.5, estado: "Disponible" },
+  { id: 2, nombre: "Ensalada César", categoria: "Ensaladas", precio: 7.0, estado: "Disponible" },
+  { id: 3, nombre: "Pasta Carbonara", categoria: "Pastas", precio: 9.0, estado: "Disponible" },
+  { id: 4, nombre: "Sopa de Tomate", categoria: "Entradas", precio: 5.0, estado: "Agotado" },
+  { id: 5, nombre: "Tiramisú", categoria: "Postres", precio: 5.5, estado: "Disponible" },
+  { id: 6, nombre: "Limonada Natural", categoria: "Bebidas", precio: 3.5, estado: "Agotado" },
+];
+
+const tone = (e: string) => (e === "Disponible" ? "success" : "warning");
+
+export default function MenuPage() {
+  const router = useRouter();
+  const [platos] = useState(MOCK);
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Menú</h1>
-      <ul className="space-y-2">
-        {menuItems.map(item => (
-          <li key={item.id} className="border p-4 rounded">
-            <h2 className="text-xl font-semibold">{item.name}</h2>
-            <p>{item.description}</p>
-            <p className="text-green-600">${item.price}</p>
-          </li>
-        ))}
-      </ul>
+    <div className="space-y-6">
+      <PageHeader
+        title="Menú"
+        subtitle="Administra los platos, precios y disponibilidad de la carta."
+        action={
+          <Button onClick={() => router.push("/men/create")}>
+            <Plus size={16} /> Nuevo plato
+          </Button>
+        }
+      />
+      <Card className="!p-0">
+        <DataTable<Plato>
+          rows={platos}
+          columns={[
+            { key: "nombre", header: "Plato", render: (r) => (
+              <div className="flex items-center gap-3">
+                <Avatar name={r.nombre} />
+                <span className="font-medium text-slate-900">{r.nombre}</span>
+              </div>
+            ) },
+            { key: "categoria", header: "Categoría", render: (r) => <Badge tone="neutral">{r.categoria}</Badge> },
+            { key: "estado", header: "Estado", render: (r) => <Badge tone={tone(r.estado)}>{r.estado}</Badge> },
+            { key: "precio", header: "Precio", align: "right", render: (r) => (
+              <span className="font-semibold text-slate-900">${r.precio.toFixed(2)}</span>
+            ) },
+            { key: "acciones", header: "", align: "right", render: () => (
+              <div className="flex justify-end gap-2">
+                <Button variant="ghost" className="cursor-pointer">Editar</Button>
+                <Button variant="danger" className="cursor-pointer">Eliminar</Button>
+              </div>
+            ) },
+          ]}
+        />
+      </Card>
     </div>
   );
-};
-
-export default MenPage;
+}

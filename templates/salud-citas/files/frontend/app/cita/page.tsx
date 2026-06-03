@@ -1,60 +1,78 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useRouter } from 'next/router';
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Plus, Pencil, Trash2 } from "lucide-react";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Card } from "@/components/ui/Card";
+import { DataTable } from "@/components/ui/DataTable";
+import { Avatar } from "@/components/ui/Avatar";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 
-const CitaPage = () => {
-  const [citas, setCitas] = useState([]);
-  const router = useRouter();
-
-  useEffect(() => {
-    const fetchCitas = async () => {
-      try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/citas`);
-        setCitas(response.data);
-      } catch (error) {
-        console.error('Error fetching citas:', error);
-      }
-    };
-    fetchCitas();
-  }, []);
-
-  const handleAddCita = () => {
-    router.push('/cita/create');
-  };
-
-  return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Citas</h1>
-      <button onClick={handleAddCita} className="bg-blue-500 text-white px-4 py-2 rounded mb-4">Agregar Cita</button>
-      <table className="min-w-full bg-white">
-        <thead>
-          <tr>
-            <th className="py-2">Paciente</th>
-            <th className="py-2">Profesional</th>
-            <th className="py-2">Fecha</th>
-            <th className="py-2">Hora</th>
-            <th className="py-2">Estado</th>
-            <th className="py-2">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {citas.map((cita) => (
-            <tr key={cita.id} className="text-center">
-              <td className="py-2">{cita.paciente}</td>
-              <td className="py-2">{cita.profesional}</td>
-              <td className="py-2">{cita.fecha}</td>
-              <td className="py-2">{cita.hora}</td>
-              <td className="py-2">{cita.estado}</td>
-              <td className="py-2">
-                <button className="bg-green-500 text-white px-2 py-1 rounded mr-2">Editar</button>
-                <button className="bg-red-500 text-white px-2 py-1 rounded">Eliminar</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+type Cita = {
+  paciente: string;
+  profesional: string;
+  especialidad: string;
+  fecha: string;
+  estado: "Confirmada" | "Pendiente" | "Cancelada";
 };
 
-export default CitaPage;
+const MOCK: Cita[] = [
+  { paciente: "Juan Pérez", profesional: "Dra. Rodríguez", especialidad: "Cardiología", fecha: "03 jun 2026 · 09:00", estado: "Confirmada" },
+  { paciente: "Ana Gómez", profesional: "Dr. Fernández", especialidad: "Dermatología", fecha: "03 jun 2026 · 10:30", estado: "Pendiente" },
+  { paciente: "Carlos Ruiz", profesional: "Dra. López", especialidad: "Neurología", fecha: "03 jun 2026 · 12:00", estado: "Cancelada" },
+  { paciente: "Laura Martínez", profesional: "Dr. Gómez", especialidad: "Pediatría", fecha: "03 jun 2026 · 15:30", estado: "Confirmada" },
+  { paciente: "Pedro Sánchez", profesional: "Dra. Torres", especialidad: "Ginecología", fecha: "04 jun 2026 · 08:15", estado: "Pendiente" },
+];
+
+const tone = (e: Cita["estado"]) => (e === "Confirmada" ? "success" : e === "Pendiente" ? "warning" : "danger");
+
+export default function Page() {
+  const router = useRouter();
+  const [rows] = useState<Cita[]>(MOCK);
+
+  const columns = [
+    {
+      key: "paciente",
+      header: "Paciente",
+      render: (r: Cita) => (
+        <div className="flex items-center gap-3">
+          <Avatar name={r.paciente} />
+          <span className="font-medium text-slate-900">{r.paciente}</span>
+        </div>
+      ),
+    },
+    { key: "profesional", header: "Profesional", render: (r: Cita) => <span className="text-slate-600">{r.profesional}</span> },
+    { key: "especialidad", header: "Especialidad", render: (r: Cita) => <Badge tone="brand">{r.especialidad}</Badge> },
+    { key: "fecha", header: "Fecha / hora", render: (r: Cita) => <span className="text-slate-600">{r.fecha}</span> },
+    { key: "estado", header: "Estado", render: (r: Cita) => <Badge tone={tone(r.estado)}>{r.estado}</Badge> },
+    {
+      key: "acciones",
+      header: "Acciones",
+      align: "right" as const,
+      render: () => (
+        <div className="flex justify-end gap-1">
+          <Button variant="ghost" className="cursor-pointer !px-2.5"><Pencil size={15} /> Editar</Button>
+          <Button variant="danger" className="cursor-pointer !px-2.5"><Trash2 size={15} /> Eliminar</Button>
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <PageHeader
+        title="Citas"
+        subtitle="Agenda de consultas con su estado y profesional asignado."
+        action={
+          <Button className="cursor-pointer" onClick={() => router.push("/cita/create")}>
+            <Plus size={16} /> Nueva cita
+          </Button>
+        }
+      />
+      <Card className="!p-0">
+        <DataTable columns={columns} rows={rows} empty="Aún no hay citas agendadas." />
+      </Card>
+    </div>
+  );
+}

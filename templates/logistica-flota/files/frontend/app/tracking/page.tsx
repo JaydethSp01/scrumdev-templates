@@ -1,57 +1,66 @@
 "use client";
-import { useState } from 'react';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Plus, Pencil, Trash2 } from "lucide-react";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Card } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { Avatar } from "@/components/ui/Avatar";
+import { Button } from "@/components/ui/Button";
+import { DataTable } from "@/components/ui/DataTable";
 
-const MOCK_DATA = {
-  trackings: [
-    { id: 1, ruta: 'Ruta 1', vehiculo: 'Camión A', conductor: 'Juan Pérez', estado: 'En tránsito' },
-    { id: 2, ruta: 'Ruta 2', vehiculo: 'Camión B', conductor: 'María López', estado: 'Entregado' },
-    { id: 3, ruta: 'Ruta 3', vehiculo: 'Camión C', conductor: 'Carlos García', estado: 'Pendiente' },
-    { id: 4, ruta: 'Ruta 4', vehiculo: 'Camión D', conductor: 'Ana Martínez', estado: 'En tránsito' },
-  ]
-};
+type Tracking = { guia: string; ruta: string; vehiculo: string; conductor: string; estado: string };
+
+const MOCK: Tracking[] = [
+  { guia: "GU-4821", ruta: "Bogotá → Medellín", vehiculo: "Camión A", conductor: "Juan Pérez", estado: "Entregado" },
+  { guia: "GU-4822", ruta: "Cali → Pereira", vehiculo: "Camión B", conductor: "María López", estado: "En tránsito" },
+  { guia: "GU-4823", ruta: "Barranquilla → Cartagena", vehiculo: "Camión C", conductor: "Carlos García", estado: "Retrasado" },
+  { guia: "GU-4824", ruta: "Bogotá → Bucaramanga", vehiculo: "Camión D", conductor: "Ana Martínez", estado: "En tránsito" },
+  { guia: "GU-4825", ruta: "Medellín → Manizales", vehiculo: "Camión E", conductor: "Diego Torres", estado: "Cancelado" },
+];
+
+const tone = (e: string) =>
+  e === "Entregado" ? "success" : e === "En tránsito" ? "info" : e === "Retrasado" ? "warning" : "danger";
 
 export default function TrackingPage() {
-  const [trackings] = useState(MOCK_DATA.trackings);
+  const router = useRouter();
+  const [rows] = useState(MOCK);
+
+  const columns = [
+    { key: "guia", header: "Guía", render: (r: Tracking) => (
+      <span className="font-mono text-slate-700">{r.guia}</span>
+    ) },
+    { key: "ruta", header: "Ruta", render: (r: Tracking) => (
+      <span className="text-slate-600">{r.ruta}</span>
+    ) },
+    { key: "conductor", header: "Conductor", render: (r: Tracking) => (
+      <div className="flex items-center gap-2">
+        <Avatar name={r.conductor} />
+        <div>
+          <p className="text-slate-700">{r.conductor}</p>
+          <p className="text-xs text-slate-500">{r.vehiculo}</p>
+        </div>
+      </div>
+    ) },
+    { key: "estado", header: "Estado", render: (r: Tracking) => <Badge tone={tone(r.estado)}>{r.estado}</Badge> },
+    { key: "acciones", header: "", align: "right" as const, render: () => (
+      <div className="flex justify-end gap-1">
+        <Button variant="ghost" className="cursor-pointer !px-2"><Pencil size={16} /></Button>
+        <Button variant="ghost" className="cursor-pointer !px-2 text-rose-600"><Trash2 size={16} /></Button>
+      </div>
+    ) },
+  ];
 
   return (
-    <div className="p-8 space-y-8">
-      <header>
-        <h1 className="text-3xl font-bold tracking-tight">Seguimiento de Envíos</h1>
-        <p className="text-neutral-500 mt-1">Monitorea el estado de tus envíos en tiempo real</p>
-      </header>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {trackings.map(tracking => (
-          <div key={tracking.id} className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
-            <p className="text-sm text-neutral-500">Ruta: {tracking.ruta}</p>
-            <p className="text-lg font-semibold mt-1">Vehículo: {tracking.vehiculo}</p>
-            <p className="text-lg font-semibold">Conductor: {tracking.conductor}</p>
-            <p className="text-sm text-neutral-500 mt-1">Estado: {tracking.estado}</p>
-          </div>
-        ))}
-      </div>
-      <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
-        <h2 className="font-semibold mb-4">Detalle de Tracking</h2>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-left text-neutral-500">
-              <th className="py-2">Ruta</th>
-              <th className="py-2">Vehículo</th>
-              <th className="py-2">Conductor</th>
-              <th className="py-2">Estado</th>
-            </tr>
-          </thead>
-          <tbody>
-            {trackings.map(tracking => (
-              <tr key={tracking.id} className="border-t border-neutral-100 dark:border-neutral-800">
-                <td className="py-3">{tracking.ruta}</td>
-                <td className="py-3">{tracking.vehiculo}</td>
-                <td className="py-3">{tracking.conductor}</td>
-                <td className="py-3">{tracking.estado}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        title="Seguimiento"
+        subtitle="Monitorea el estado de tus envíos en tiempo real."
+        action={<Button className="cursor-pointer" onClick={() => router.push("/tracking/create")}><Plus size={16} /> Nuevo seguimiento</Button>}
+      />
+      <Card className="!p-0">
+        <DataTable columns={columns} rows={rows} empty="Sin envíos en seguimiento." />
+      </Card>
     </div>
   );
 }

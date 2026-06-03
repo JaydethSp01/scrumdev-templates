@@ -1,46 +1,56 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Plus } from "lucide-react";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Card } from "@/components/ui/Card";
+import { DataTable } from "@/components/ui/DataTable";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 
-const TallaPage = () => {
-  const [tallas, setTallas] = useState([]);
+const MOCK = [
+  { id: 1, talla: "S", tipo: "Ropa", skus: 58, estado: "Activa" },
+  { id: 2, talla: "M", tipo: "Ropa", skus: 72, estado: "Activa" },
+  { id: 3, talla: "L", tipo: "Ropa", skus: 64, estado: "Activa" },
+  { id: 4, talla: "XL", tipo: "Ropa", skus: 39, estado: "Activa" },
+  { id: 5, talla: "42", tipo: "Calzado", skus: 21, estado: "Activa" },
+  { id: 6, talla: "Única", tipo: "Accesorios", skus: 47, estado: "Inactiva" },
+];
 
-  useEffect(() => {
-    const fetchTallas = async () => {
-      try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || '/api/mock'}/talla`);
-        setTallas(response.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
+const tone = (e: string) => (e === "Activa" ? "success" : "neutral");
 
-    fetchTallas();
-  }, []);
+export default function Page() {
+  const router = useRouter();
+  const [rows] = useState(MOCK);
+
+  const columns = [
+    { key: "talla", header: "Talla", render: (r: any) => <Badge tone="brand">{r.talla}</Badge> },
+    { key: "tipo", header: "Tipo", render: (r: any) => <span className="font-medium text-slate-900">{r.tipo}</span> },
+    { key: "skus", header: "SKUs", align: "right" as const, render: (r: any) => <span className="text-slate-600">{r.skus}</span> },
+    { key: "estado", header: "Estado", render: (r: any) => <Badge tone={tone(r.estado)}>{r.estado}</Badge> },
+    {
+      key: "acciones",
+      header: "",
+      align: "right" as const,
+      render: () => (
+        <div className="flex justify-end gap-2">
+          <Button variant="ghost" className="cursor-pointer">Editar</Button>
+          <Button variant="danger" className="cursor-pointer">Eliminar</Button>
+        </div>
+      ),
+    },
+  ];
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Tallas</h1>
-      <table className="min-w-full bg-white">
-        <thead>
-          <tr>
-            <th className="w-1/2 px-4 py-2">Talla</th>
-            <th className="w-1/2 px-4 py-2">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {tallas.map((talla) => (
-            <tr key={talla.id}>
-              <td className="border px-4 py-2">{talla.talla}</td>
-              <td className="border px-4 py-2">
-                <button className="bg-blue-500 text-white px-2 py-1 rounded">Editar</button>
-                <button className="bg-red-500 text-white px-2 py-1 rounded ml-2">Eliminar</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="space-y-6">
+      <PageHeader
+        title="Tallas"
+        subtitle="Curva de tallas disponible por tipo de producto"
+        action={<Button variant="primary" className="cursor-pointer" onClick={() => router.push("/talla/create")}><Plus size={16} /> Nueva talla</Button>}
+      />
+      <Card className="!p-0">
+        <DataTable columns={columns} rows={rows} />
+      </Card>
     </div>
   );
-};
-
-export default TallaPage;
+}

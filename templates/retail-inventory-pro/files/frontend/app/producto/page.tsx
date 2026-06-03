@@ -1,50 +1,69 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Plus } from "lucide-react";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Card } from "@/components/ui/Card";
+import { DataTable } from "@/components/ui/DataTable";
+import { Badge } from "@/components/ui/Badge";
+import { Avatar } from "@/components/ui/Avatar";
+import { Button } from "@/components/ui/Button";
 
-const ProductoPage = () => {
-  const [productos, setProductos] = useState([]);
+const MOCK = [
+  { id: 1, nombre: "Zapatilla Runner Pro", categoria: "Calzado", precio: 89.99, stock: 0, estado: "Agotado" },
+  { id: 2, nombre: "Camiseta Oversize Negra", categoria: "Ropa", precio: 24.5, stock: 6, estado: "Stock bajo" },
+  { id: 3, nombre: "Mochila Urban 24L", categoria: "Accesorios", precio: 59.0, stock: 4, estado: "Stock bajo" },
+  { id: 4, nombre: "Gorra Trucker Índigo", categoria: "Accesorios", precio: 19.99, stock: 87, estado: "En stock" },
+  { id: 5, nombre: "Pantalón Cargo Slim", categoria: "Ropa", precio: 44.9, stock: 132, estado: "En stock" },
+  { id: 6, nombre: "Sudadera Tech Fleece", categoria: "Deportes", precio: 64.0, stock: 41, estado: "En stock" },
+];
 
-  useEffect(() => {
-    const fetchProductos = async () => {
-      try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || '/api/mock'}/producto`);
-        setProductos(response.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
+const tone = (e: string) => (e === "En stock" ? "success" : e === "Stock bajo" ? "warning" : "danger");
 
-    fetchProductos();
-  }, []);
+export default function Page() {
+  const router = useRouter();
+  const [rows] = useState(MOCK);
+
+  const columns = [
+    {
+      key: "nombre",
+      header: "Producto",
+      render: (r: any) => (
+        <div className="flex items-center gap-3">
+          <Avatar name={r.nombre} />
+          <div>
+            <p className="font-medium text-slate-900">{r.nombre}</p>
+            <p className="text-sm text-slate-500">{r.categoria}</p>
+          </div>
+        </div>
+      ),
+    },
+    { key: "precio", header: "Precio", align: "right" as const, render: (r: any) => <span className="font-medium text-slate-900">${r.precio.toFixed(2)}</span> },
+    { key: "stock", header: "Stock", align: "right" as const, render: (r: any) => <span className="text-slate-600">{r.stock} uds</span> },
+    { key: "estado", header: "Estado", render: (r: any) => <Badge tone={tone(r.estado)}>{r.estado}</Badge> },
+    {
+      key: "acciones",
+      header: "",
+      align: "right" as const,
+      render: () => (
+        <div className="flex justify-end gap-2">
+          <Button variant="ghost" className="cursor-pointer">Editar</Button>
+          <Button variant="danger" className="cursor-pointer">Eliminar</Button>
+        </div>
+      ),
+    },
+  ];
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Productos</h1>
-      <table className="min-w-full bg-white">
-        <thead>
-          <tr>
-            <th className="w-1/4 px-4 py-2">Nombre</th>
-            <th className="w-1/4 px-4 py-2">Precio</th>
-            <th className="w-1/4 px-4 py-2">Categoría</th>
-            <th className="w-1/4 px-4 py-2">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {productos.map((producto) => (
-            <tr key={producto.id}>
-              <td className="border px-4 py-2">{producto.nombre}</td>
-              <td className="border px-4 py-2">{producto.precio}</td>
-              <td className="border px-4 py-2">{producto.categoria}</td>
-              <td className="border px-4 py-2">
-                <button className="bg-blue-500 text-white px-2 py-1 rounded">Editar</button>
-                <button className="bg-red-500 text-white px-2 py-1 rounded ml-2">Eliminar</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="space-y-6">
+      <PageHeader
+        title="Productos"
+        subtitle="Catálogo completo de SKUs con stock y precios"
+        action={<Button variant="primary" className="cursor-pointer" onClick={() => router.push("/producto/create")}><Plus size={16} /> Nuevo producto</Button>}
+      />
+      <Card className="!p-0">
+        <DataTable columns={columns} rows={rows} />
+      </Card>
     </div>
   );
-};
-
-export default ProductoPage;
+}

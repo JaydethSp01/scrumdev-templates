@@ -1,60 +1,60 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Plus, Pencil, Trash2 } from "lucide-react";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Card } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { DataTable } from "@/components/ui/DataTable";
 
-const VehiculoPage = () => {
-  const [vehiculos, setVehiculos] = useState([]);
-  const [form, setForm] = useState({
-    marca: '',
-    modelo: '',
-    matricula: ''
-  });
+type Vehiculo = { marca: string; modelo: string; matricula: string; tipo: string; estado: string };
 
-  useEffect(() => {
-    fetchVehiculos();
-  }, []);
+const MOCK: Vehiculo[] = [
+  { marca: "Ford", modelo: "Transit", matricula: "1234-ABC", tipo: "Furgón", estado: "Disponible" },
+  { marca: "Mercedes", modelo: "Sprinter", matricula: "5678-DEF", tipo: "Furgón", estado: "En ruta" },
+  { marca: "Volvo", modelo: "FH16", matricula: "9012-GHI", tipo: "Tractomula", estado: "En ruta" },
+  { marca: "Renault", modelo: "Master", matricula: "3456-JKL", tipo: "Furgón", estado: "Mantenimiento" },
+  { marca: "Scania", modelo: "R450", matricula: "7890-MNO", tipo: "Tractomula", estado: "Disponible" },
+  { marca: "Iveco", modelo: "Daily", matricula: "2468-PQR", tipo: "Camión", estado: "Inactivo" },
+];
 
-  const fetchVehiculos = async () => {
-    try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/vehiculo`);
-      setVehiculos(response.data);
-    } catch (error) {
-      console.error('Error fetching vehiculos:', error);
-    }
-  };
+const tone = (e: string) =>
+  e === "Disponible" ? "success" : e === "En ruta" ? "info" : e === "Mantenimiento" ? "warning" : "neutral";
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
-  };
+export default function VehiculoPage() {
+  const router = useRouter();
+  const [rows] = useState(MOCK);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/vehiculo`, form);
-      fetchVehiculos();
-    } catch (error) {
-      console.error('Error creating vehiculo:', error);
-    }
-  };
+  const columns = [
+    { key: "vehiculo", header: "Vehículo", render: (r: Vehiculo) => (
+      <div>
+        <p className="font-medium text-slate-900">{r.marca} {r.modelo}</p>
+        <p className="text-xs text-slate-500">{r.tipo}</p>
+      </div>
+    ) },
+    { key: "matricula", header: "Matrícula", render: (r: Vehiculo) => (
+      <span className="font-mono text-slate-700">{r.matricula}</span>
+    ) },
+    { key: "estado", header: "Estado", render: (r: Vehiculo) => <Badge tone={tone(r.estado)}>{r.estado}</Badge> },
+    { key: "acciones", header: "", align: "right" as const, render: () => (
+      <div className="flex justify-end gap-1">
+        <Button variant="ghost" className="cursor-pointer !px-2"><Pencil size={16} /></Button>
+        <Button variant="ghost" className="cursor-pointer !px-2 text-rose-600"><Trash2 size={16} /></Button>
+      </div>
+    ) },
+  ];
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Gestión de Vehículos</h1>
-      <form onSubmit={handleSubmit} className="mb-4">
-        <input type="text" name="marca" placeholder="Marca" value={form.marca} onChange={handleInputChange} className="border p-2 mr-2" />
-        <input type="text" name="modelo" placeholder="Modelo" value={form.modelo} onChange={handleInputChange} className="border p-2 mr-2" />
-        <input type="text" name="matricula" placeholder="Matrícula" value={form.matricula} onChange={handleInputChange} className="border p-2" />
-        <button type="submit" className="bg-blue-500 text-white p-2">Crear</button>
-      </form>
-      <ul>
-        {vehiculos.map((vehiculo) => (
-          <li key={vehiculo.id} className="p-2 border-b">
-            {vehiculo.marca} {vehiculo.modelo} - {vehiculo.matricula}
-          </li>
-        ))}
-      </ul>
+    <div className="space-y-6">
+      <PageHeader
+        title="Vehículos"
+        subtitle="Gestiona la flota y el estado de cada unidad."
+        action={<Button className="cursor-pointer" onClick={() => router.push("/veh-culo/create")}><Plus size={16} /> Nuevo vehículo</Button>}
+      />
+      <Card className="!p-0">
+        <DataTable columns={columns} rows={rows} empty="Sin vehículos registrados." />
+      </Card>
     </div>
   );
-};
-
-export default VehiculoPage;
+}
