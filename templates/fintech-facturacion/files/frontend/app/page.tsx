@@ -53,7 +53,7 @@ export default function Page() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <ChartCard className="lg:col-span-2" title="Facturación mensual" subtitle="Últimos 7 meses (miles $)" data={data.meses} />
+        <ChartCard className="lg:col-span-2" variant="line" title="Facturación mensual" subtitle="Últimos 7 meses (miles $)" data={data.meses} />
         <Card>
           <h3 className="mb-4 text-base font-semibold text-slate-900">Por estado de cobro</h3>
           <div className="space-y-3">

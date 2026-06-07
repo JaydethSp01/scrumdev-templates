@@ -47,7 +47,7 @@ export default function Page() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <ChartCard className="lg:col-span-2" title="Citas por día" subtitle="Esta semana" data={data.semana} />
+        <ChartCard className="lg:col-span-2" variant="area" title="Citas por día" subtitle="Esta semana" data={data.semana} />
         <Card>
           <h3 className="mb-4 text-base font-semibold text-slate-900">Por especialidad</h3>
           <div className="space-y-3">
