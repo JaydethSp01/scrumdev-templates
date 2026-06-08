@@ -1,0 +1,30 @@
+{
+  "id": "cafeteria",
+  "name": "CafePro",
+  "sector": "cafeteria",
+  "sector_label": "Cafetería / Restaurante-Café",
+  "software_type": "saas_crud",
+  "stack": "nextjs-fastapi-postgres",
+  "description": "Gestión de cafetería: productos, pedidos, mesas, clientes e inventario.",
+  "entities": [
+    "producto",
+    "pedido",
+    "mesa",
+    "cliente",
+    "inventario"
+  ],
+  "brand_color": "#0d9488",
+  "tags": [
+    "cafeteria",
+    "cafe",
+    "restaurante",
+    "pedidos",
+    "mesas",
+    "inventario",
+    "menu"
+  ],
+  "accent": "",
+  "has_files": false,
+  "preview_url": "https://raw.githubusercontent.com/JaydethSp01/scrumdev-templates/main/templates/cafeteria/preview.png",
+  "seeded_at": "2026-06-08"
+}

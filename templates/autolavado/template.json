@@ -1,0 +1,31 @@
+{
+  "id": "autolavado",
+  "name": "WashPro",
+  "sector": "autolavado",
+  "description": "Gestión de autolavado: servicios, vehículos, clientes, empleados y pagos.",
+  "sector_label": "Autolavado / Car Wash",
+  "software_type": "saas_crud",
+  "stack": "nextjs-fastapi-postgres",
+  "entities": [
+    "servicio",
+    "vehiculo",
+    "cliente",
+    "empleado",
+    "pago"
+  ],
+  "brand_color": "#0284c7",
+  "tags": [
+    "autolavado",
+    "car wash",
+    "lavado",
+    "vehiculos",
+    "servicios",
+    "clientes",
+    "empleados",
+    "pagos"
+  ],
+  "accent": "",
+  "has_files": false,
+  "preview_url": "https://raw.githubusercontent.com/JaydethSp01/scrumdev-templates/main/templates/autolavado/preview.png",
+  "seeded_at": "2026-06-08"
+}

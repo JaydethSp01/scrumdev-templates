@@ -1,0 +1,1 @@
+from pydantic import BaseModel; class Paciente(BaseModel): id: int; nombre: str; class Profesional(BaseModel): id: int; nombre: str; class Cita(BaseModel): id: int; nombre: str; estado: str;
