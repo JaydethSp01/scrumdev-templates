@@ -1,0 +1,6 @@
+{
+  "id": "farmacia",
+  "name": "FarmaApp",
+  "sector": "farmacia",
+  "description": "Gestión de farmacia/droguería: productos, ventas, inventario con vencimientos, clientes y proveedores."
+}

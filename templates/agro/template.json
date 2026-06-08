@@ -1,0 +1,6 @@
+{
+  "id": "agro",
+  "name": "AgroApp",
+  "sector": "agro",
+  "description": "Gestión agrícola/finca: cultivos, lotes, insumos, cosechas y trabajadores."
+}
