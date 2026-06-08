@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/Badge";
 
 type Tone = "neutral" | "success" | "warning" | "danger" | "info" | "brand";
 const tones: Record<string, Tone> = {
-  Odontología general: "brand", Ortodoncia: "info", Endodoncia: "warning",
+  "Odontología general": "brand", Ortodoncia: "info", Endodoncia: "warning",
   Periodoncia: "success", "Cirugía maxilofacial": "danger", Odontopediatría: "info",
 };
 const toneFor = (s: string): Tone => tones[s] ?? "neutral";
