@@ -24,7 +24,7 @@ const tone = (e: string) =>
 
 export default function CocinaPage() {
   const router = useRouter();
-  const [tickets] = useState(MOCK);
+  const [tickets, setTickets] = useState(MOCK);
 
   return (
     <div className="space-y-6">
@@ -54,10 +54,10 @@ export default function CocinaPage() {
             ) },
             { key: "tiempo", header: "En cola", render: (r) => <span className="text-slate-500">{r.tiempo}</span> },
             { key: "estado", header: "Estado", render: (r) => <Badge tone={tone(r.estado)}>{r.estado}</Badge> },
-            { key: "acciones", header: "", align: "right", render: () => (
+            { key: "acciones", header: "", align: "right", render: (r) => (
               <div className="flex justify-end gap-2">
-                <Button variant="ghost" className="cursor-pointer">Editar</Button>
-                <Button variant="danger" className="cursor-pointer">Eliminar</Button>
+                <Button variant="ghost" className="cursor-pointer" onClick={() => setTickets((ts) => ts.map((t) => (t === r ? { ...t, estado: "Servido" } : t)))}>Marcar listo</Button>
+                <Button variant="danger" className="cursor-pointer" onClick={() => setTickets((ts) => ts.filter((t) => t !== r))}>Eliminar</Button>
               </div>
             ) },
           ]}

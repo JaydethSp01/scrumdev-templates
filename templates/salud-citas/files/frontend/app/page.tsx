@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useState } from "react";
 import { CalendarCheck, Users, Stethoscope, Activity, Plus } from "lucide-react";
 import { Hero } from "@/components/ui/Hero";
@@ -37,7 +38,7 @@ export default function Page() {
       <Hero
         title="Buenos días, equipo Vida"
         subtitle="Tienes 24 citas hoy. La ocupación está al 86% — un día movido en consulta."
-        action={<Button variant="secondary" className="!bg-white !text-brand"><Plus size={16} /> Nueva cita</Button>}
+        action={<Link href="/agenda"><Button variant="secondary" className="!bg-white !text-brand"><Plus size={16} /> Nueva cita</Button></Link>}
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

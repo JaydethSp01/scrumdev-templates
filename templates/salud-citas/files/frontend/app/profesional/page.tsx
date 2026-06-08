@@ -1,72 +1,33 @@
 "use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { CrudTable } from "@/components/ui/CrudTable";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { Card } from "@/components/ui/Card";
-import { DataTable } from "@/components/ui/DataTable";
-import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
 
-type Profesional = {
-  nombre: string;
-  especialidad: string;
-  pacientes: number;
-};
-
-const MOCK: Profesional[] = [
-  { nombre: "Dra. Rodríguez", especialidad: "Cardiología", pacientes: 142 },
-  { nombre: "Dr. Fernández", especialidad: "Dermatología", pacientes: 98 },
-  { nombre: "Dra. López", especialidad: "Neurología", pacientes: 76 },
-  { nombre: "Dr. Gómez", especialidad: "Pediatría", pacientes: 165 },
-  { nombre: "Dra. Torres", especialidad: "Ginecología", pacientes: 121 },
-];
+type Tone = "neutral" | "success" | "warning" | "danger" | "info" | "brand";
+const tones: Record<string, Tone> = { Disponible: "success", "En consulta": "info", Ausente: "warning" };
+const toneFor = (s: string): Tone => tones[s] ?? "neutral";
 
 export default function Page() {
-  const router = useRouter();
-  const [rows] = useState<Profesional[]>(MOCK);
-
-  const columns = [
-    {
-      key: "nombre",
-      header: "Profesional",
-      render: (r: Profesional) => (
-        <div className="flex items-center gap-3">
-          <Avatar name={r.nombre} />
-          <span className="font-medium text-slate-900">{r.nombre}</span>
-        </div>
-      ),
-    },
-    { key: "especialidad", header: "Especialidad", render: (r: Profesional) => <Badge tone="brand">{r.especialidad}</Badge> },
-    { key: "pacientes", header: "Pacientes", render: (r: Profesional) => <span className="text-slate-600">{r.pacientes}</span> },
-    {
-      key: "acciones",
-      header: "Acciones",
-      align: "right" as const,
-      render: () => (
-        <div className="flex justify-end gap-1">
-          <Button variant="ghost" className="cursor-pointer !px-2.5"><Pencil size={15} /> Editar</Button>
-          <Button variant="danger" className="cursor-pointer !px-2.5"><Trash2 size={15} /> Eliminar</Button>
-        </div>
-      ),
-    },
-  ];
-
   return (
     <div className="space-y-6">
-      <PageHeader
+      <PageHeader title="Profesionales" subtitle="Equipo médico, sus especialidades y carga de pacientes." />
+      <CrudTable
         title="Profesionales"
-        subtitle="Equipo médico, sus especialidades y carga de pacientes."
-        action={
-          <Button className="cursor-pointer" onClick={() => router.push("/profesional/create")}>
-            <Plus size={16} /> Nuevo profesional
-          </Button>
-        }
+        fields={[
+          { key: "nombre", label: "Profesional" },
+          { key: "especialidad", label: "Especialidad" },
+          { key: "email", label: "Email", type: "email" },
+          { key: "pacientes", label: "Pacientes", type: "number" },
+          { key: "estado", label: "Estado", render: (r: any) => <Badge tone={toneFor(r.estado)}>{r.estado}</Badge> },
+        ]}
+        initial={[
+          { id: 1, nombre: "Dra. Rodríguez", especialidad: "Cardiología", email: "rodriguez@clinica.co", pacientes: 142, estado: "Disponible" },
+          { id: 2, nombre: "Dr. Fernández", especialidad: "Dermatología", email: "fernandez@clinica.co", pacientes: 98, estado: "En consulta" },
+          { id: 3, nombre: "Dra. López", especialidad: "Neurología", email: "lopez@clinica.co", pacientes: 76, estado: "Ausente" },
+          { id: 4, nombre: "Dr. Gómez", especialidad: "Pediatría", email: "gomez@clinica.co", pacientes: 165, estado: "Disponible" },
+          { id: 5, nombre: "Dra. Torres", especialidad: "Ginecología", email: "torres@clinica.co", pacientes: 121, estado: "En consulta" },
+        ]}
       />
-      <Card className="!p-0">
-        <DataTable columns={columns} rows={rows} empty="Aún no hay profesionales registrados." />
-      </Card>
     </div>
   );
 }

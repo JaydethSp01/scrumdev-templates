@@ -1,80 +1,33 @@
 "use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Plus } from "lucide-react";
+import { CrudTable } from "@/components/ui/CrudTable";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { Card } from "@/components/ui/Card";
-import { DataTable, type Column } from "@/components/ui/DataTable";
 import { Badge } from "@/components/ui/Badge";
-import { Avatar } from "@/components/ui/Avatar";
-import { Button } from "@/components/ui/Button";
 
-type Pedido = {
-  codigo: string;
-  cliente: string;
-  items: number;
-  total: number;
-  estado: "Pagado" | "Enviado" | "Pendiente" | "Cancelado";
-};
+type Tone = "neutral" | "success" | "warning" | "danger" | "info" | "brand";
+const tones: Record<string, Tone> = { Pagado: "success", Enviado: "info", Pendiente: "warning", Cancelado: "danger" };
+const toneFor = (s: string): Tone => tones[s] ?? "neutral";
 
-const MOCK: Pedido[] = [
-  { codigo: "#MS-1042", cliente: "Valentina Ríos", items: 2, total: 128.0, estado: "Pagado" },
-  { codigo: "#MS-1041", cliente: "Camila Soto", items: 1, total: 95.0, estado: "Enviado" },
-  { codigo: "#MS-1040", cliente: "Mariana Peña", items: 1, total: 72.0, estado: "Pendiente" },
-  { codigo: "#MS-1039", cliente: "Lucía Fernández", items: 3, total: 210.0, estado: "Cancelado" },
-  { codigo: "#MS-1038", cliente: "Daniela Castro", items: 2, total: 113.5, estado: "Pagado" },
-  { codigo: "#MS-1037", cliente: "Sofía Herrera", items: 1, total: 49.5, estado: "Enviado" },
-];
-
-const tone = (e: Pedido["estado"]) =>
-  e === "Pagado" ? "success" : e === "Enviado" ? "info" : e === "Pendiente" ? "warning" : "danger";
-
-export default function PedidoPage() {
-  const router = useRouter();
-  const [rows] = useState(MOCK);
-
-  const columns: Column<Pedido>[] = [
-    { key: "codigo", header: "Pedido", render: (r) => <span className="font-medium text-slate-900">{r.codigo}</span> },
-    {
-      key: "cliente",
-      header: "Cliente",
-      render: (r) => (
-        <div className="flex items-center gap-3">
-          <Avatar name={r.cliente} />
-          <span className="text-slate-700">{r.cliente}</span>
-        </div>
-      ),
-    },
-    { key: "items", header: "Ítems", align: "right", render: (r) => <span className="text-slate-600">{r.items}</span> },
-    { key: "total", header: "Total", align: "right", render: (r) => <span className="font-semibold text-slate-900">${r.total.toFixed(2)}</span> },
-    { key: "estado", header: "Estado", render: (r) => <Badge tone={tone(r.estado)}>{r.estado}</Badge> },
-    {
-      key: "acciones",
-      header: "",
-      align: "right",
-      render: () => (
-        <div className="flex justify-end gap-1">
-          <Button variant="ghost" className="cursor-pointer">Editar</Button>
-          <Button variant="danger" className="cursor-pointer">Eliminar</Button>
-        </div>
-      ),
-    },
-  ];
-
+export default function Page() {
   return (
     <div className="space-y-6">
-      <PageHeader
+      <PageHeader title="Pedidos" subtitle="Seguimiento de compras y estados de envío." />
+      <CrudTable
         title="Pedidos"
-        subtitle="Seguimiento de compras y estados de envío."
-        action={
-          <Button className="cursor-pointer" onClick={() => router.push("/pedido/create")}>
-            <Plus size={16} /> Nuevo
-          </Button>
-        }
+        fields={[
+          { key: "codigo", label: "Pedido" },
+          { key: "cliente", label: "Cliente" },
+          { key: "items", label: "Ítems", type: "number" },
+          { key: "total", label: "Total", type: "number" },
+          { key: "estado", label: "Estado", render: (r: any) => <Badge tone={toneFor(r.estado)}>{r.estado}</Badge> },
+        ]}
+        initial={[
+          { id: 1, codigo: "#MS-1042", cliente: "Valentina Ríos", items: 2, total: 287800, estado: "Pagado" },
+          { id: 2, codigo: "#MS-1041", cliente: "Camila Soto", items: 1, total: 239900, estado: "Enviado" },
+          { id: 3, codigo: "#MS-1040", cliente: "Mariana Peña", items: 1, total: 119900, estado: "Pendiente" },
+          { id: 4, codigo: "#MS-1039", cliente: "Lucía Fernández", items: 3, total: 419700, estado: "Cancelado" },
+          { id: 5, codigo: "#MS-1038", cliente: "Daniela Castro", items: 2, total: 199800, estado: "Pagado" },
+        ]}
       />
-      <Card className="!p-0">
-        <DataTable columns={columns} rows={rows} empty="Aún no hay pedidos." />
-      </Card>
     </div>
   );
 }

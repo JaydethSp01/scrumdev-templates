@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useState } from "react";
 import { ShoppingBag, DollarSign, Users, Clock, Plus } from "lucide-react";
 import { Hero } from "@/components/ui/Hero";
@@ -43,7 +44,7 @@ export default function Page() {
       <Hero
         title="Buenas tardes, equipo Sazón"
         subtitle="142 pedidos hoy y 18 de 24 mesas ocupadas. El servicio va a buen ritmo."
-        action={<Button variant="secondary" className="!bg-white !text-brand"><Plus size={16} /> Nuevo pedido</Button>}
+        action={<Link href="/pos"><Button variant="secondary" className="!bg-white !text-brand"><Plus size={16} /> Nuevo pedido</Button></Link>}
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

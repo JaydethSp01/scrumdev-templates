@@ -1,87 +1,33 @@
 "use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { CrudTable } from "@/components/ui/CrudTable";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { Card } from "@/components/ui/Card";
-import { DataTable } from "@/components/ui/DataTable";
 import { Badge } from "@/components/ui/Badge";
-import { Avatar } from "@/components/ui/Avatar";
-import { Button } from "@/components/ui/Button";
 
-type Actividad = {
-  id: number;
-  contacto: string;
-  tipo: string;
-  descripcion: string;
-  fecha: string;
-  estado: string;
-};
+type Tone = "neutral" | "success" | "warning" | "danger" | "info" | "brand";
+const tones: Record<string, Tone> = { Completada: "success", Pendiente: "warning", Cancelada: "danger" };
+const toneFor = (s: string): Tone => tones[s] ?? "neutral";
 
-const MOCK: Actividad[] = [
-  { id: 1, contacto: "Carlos Ruiz", tipo: "Llamada", descripcion: "Cierre de licencias Enterprise", fecha: "2026-06-03", estado: "Completada" },
-  { id: 2, contacto: "Elena Ríos", tipo: "Reunión", descripcion: "Demo de migración a la nube", fecha: "2026-06-04", estado: "Pendiente" },
-  { id: 3, contacto: "Juan Pérez", tipo: "Email", descripcion: "Envío de propuesta Starter", fecha: "2026-06-02", estado: "Completada" },
-  { id: 4, contacto: "Ana Gómez", tipo: "Llamada", descripcion: "Seguimiento integración API", fecha: "2026-06-05", estado: "Pendiente" },
-  { id: 5, contacto: "Luis Martínez", tipo: "Reunión", descripcion: "Revisión de soporte premium", fecha: "2026-06-01", estado: "Cancelada" },
-];
-
-const tone = (e: string) =>
-  e === "Completada" ? "success" : e === "Pendiente" ? "warning" : "danger";
-
-export default function ActividadesPage() {
-  const [data] = useState(MOCK);
-  const router = useRouter();
-
+export default function Page() {
   return (
     <div className="space-y-6">
-      <PageHeader
+      <PageHeader title="Actividades" subtitle="Llamadas, reuniones y correos del equipo comercial." />
+      <CrudTable
         title="Actividades"
-        subtitle="Llamadas, reuniones y correos del equipo comercial."
-        action={
-          <Button className="cursor-pointer" onClick={() => router.push("/actividades/create")}>
-            <Plus size={16} /> Nueva actividad
-          </Button>
-        }
+        fields={[
+          { key: "tipo", label: "Tipo" },
+          { key: "descripcion", label: "Asunto" },
+          { key: "contacto", label: "Contacto" },
+          { key: "fecha", label: "Fecha" },
+          { key: "estado", label: "Estado", render: (r: any) => <Badge tone={toneFor(r.estado)}>{r.estado}</Badge> },
+        ]}
+        initial={[
+          { id: 1, tipo: "Llamada", descripcion: "Cierre de licencias Enterprise", contacto: "Carlos Ruiz", fecha: "2026-06-03", estado: "Completada" },
+          { id: 2, tipo: "Reunión", descripcion: "Demo de migración a la nube", contacto: "Elena Ríos", fecha: "2026-06-04", estado: "Pendiente" },
+          { id: 3, tipo: "Email", descripcion: "Envío de propuesta Starter", contacto: "Juan Pérez", fecha: "2026-06-02", estado: "Completada" },
+          { id: 4, tipo: "Llamada", descripcion: "Seguimiento integración API", contacto: "Ana Gómez", fecha: "2026-06-05", estado: "Pendiente" },
+          { id: 5, tipo: "Reunión", descripcion: "Revisión de soporte premium", contacto: "Luis Martínez", fecha: "2026-06-01", estado: "Cancelada" },
+        ]}
       />
-
-      <Card className="!p-0">
-        <DataTable<Actividad>
-          rows={data}
-          columns={[
-            {
-              key: "contacto",
-              header: "Contacto",
-              render: (r) => (
-                <div className="flex items-center gap-3">
-                  <Avatar name={r.contacto} />
-                  <div>
-                    <p className="font-medium text-slate-900">{r.contacto}</p>
-                    <p className="text-xs text-slate-500">{r.tipo} · {r.descripcion}</p>
-                  </div>
-                </div>
-              ),
-            },
-            { key: "fecha", header: "Fecha" },
-            { key: "estado", header: "Estado", render: (r) => <Badge tone={tone(r.estado)}>{r.estado}</Badge> },
-            {
-              key: "acciones",
-              header: "Acciones",
-              align: "right",
-              render: () => (
-                <div className="flex justify-end gap-2">
-                  <Button variant="ghost" className="cursor-pointer">
-                    <Pencil size={15} /> Editar
-                  </Button>
-                  <Button variant="danger" className="cursor-pointer">
-                    <Trash2 size={15} /> Eliminar
-                  </Button>
-                </div>
-              ),
-            },
-          ]}
-        />
-      </Card>
     </div>
   );
 }

@@ -1,73 +1,34 @@
 "use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { CrudTable } from "@/components/ui/CrudTable";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { Card } from "@/components/ui/Card";
-import { DataTable } from "@/components/ui/DataTable";
-import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
 
-type Horario = {
-  profesional: string;
-  dia: string;
-  franja: string;
-};
-
-const MOCK: Horario[] = [
-  { profesional: "Dra. Rodríguez", dia: "Lunes", franja: "08:00 - 13:00" },
-  { profesional: "Dr. Fernández", dia: "Lunes", franja: "14:00 - 18:00" },
-  { profesional: "Dra. López", dia: "Martes", franja: "09:00 - 12:00" },
-  { profesional: "Dr. Gómez", dia: "Miércoles", franja: "08:00 - 15:00" },
-  { profesional: "Dra. Torres", dia: "Jueves", franja: "10:00 - 17:00" },
-  { profesional: "Dra. Rodríguez", dia: "Viernes", franja: "08:00 - 12:00" },
-];
+type Tone = "neutral" | "success" | "warning" | "danger" | "info" | "brand";
+const tones: Record<string, Tone> = { Activo: "success", Bloqueado: "danger" };
+const toneFor = (s: string): Tone => tones[s] ?? "neutral";
 
 export default function Page() {
-  const router = useRouter();
-  const [rows] = useState<Horario[]>(MOCK);
-
-  const columns = [
-    {
-      key: "profesional",
-      header: "Profesional",
-      render: (r: Horario) => (
-        <div className="flex items-center gap-3">
-          <Avatar name={r.profesional} />
-          <span className="font-medium text-slate-900">{r.profesional}</span>
-        </div>
-      ),
-    },
-    { key: "dia", header: "Día", render: (r: Horario) => <Badge tone="brand">{r.dia}</Badge> },
-    { key: "franja", header: "Franja", render: (r: Horario) => <span className="text-slate-600">{r.franja}</span> },
-    {
-      key: "acciones",
-      header: "Acciones",
-      align: "right" as const,
-      render: () => (
-        <div className="flex justify-end gap-1">
-          <Button variant="ghost" className="cursor-pointer !px-2.5"><Pencil size={15} /> Editar</Button>
-          <Button variant="danger" className="cursor-pointer !px-2.5"><Trash2 size={15} /> Eliminar</Button>
-        </div>
-      ),
-    },
-  ];
-
   return (
     <div className="space-y-6">
-      <PageHeader
+      <PageHeader title="Horarios" subtitle="Disponibilidad semanal de cada profesional." />
+      <CrudTable
         title="Horarios"
-        subtitle="Disponibilidad semanal de cada profesional."
-        action={
-          <Button className="cursor-pointer" onClick={() => router.push("/horario/create")}>
-            <Plus size={16} /> Nuevo horario
-          </Button>
-        }
+        fields={[
+          { key: "profesional", label: "Profesional" },
+          { key: "dia", label: "Día" },
+          { key: "franja", label: "Franja" },
+          { key: "consultorio", label: "Consultorio" },
+          { key: "estado", label: "Estado", render: (r: any) => <Badge tone={toneFor(r.estado)}>{r.estado}</Badge> },
+        ]}
+        initial={[
+          { id: 1, profesional: "Dra. Rodríguez", dia: "Lunes", franja: "08:00 - 13:00", consultorio: "C-101", estado: "Activo" },
+          { id: 2, profesional: "Dr. Fernández", dia: "Lunes", franja: "14:00 - 18:00", consultorio: "C-203", estado: "Activo" },
+          { id: 3, profesional: "Dra. López", dia: "Martes", franja: "09:00 - 12:00", consultorio: "C-105", estado: "Activo" },
+          { id: 4, profesional: "Dr. Gómez", dia: "Miércoles", franja: "08:00 - 15:00", consultorio: "C-102", estado: "Bloqueado" },
+          { id: 5, profesional: "Dra. Torres", dia: "Jueves", franja: "10:00 - 17:00", consultorio: "C-210", estado: "Activo" },
+          { id: 6, profesional: "Dra. Rodríguez", dia: "Viernes", franja: "08:00 - 12:00", consultorio: "C-101", estado: "Activo" },
+        ]}
       />
-      <Card className="!p-0">
-        <DataTable columns={columns} rows={rows} empty="Aún no hay horarios definidos." />
-      </Card>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useState } from "react";
 import { ShoppingBag, Package, DollarSign, TrendingUp, Plus } from "lucide-react";
 import { Hero } from "@/components/ui/Hero";
@@ -42,7 +43,7 @@ export default function Page() {
       <Hero
         title="Tu tienda hoy, Moda Store"
         subtitle="Llevas 86 pedidos y $4.820 en ventas. El fin de semana viene fuerte — buen momento para reponer."
-        action={<Button variant="secondary" className="!bg-white !text-brand"><Plus size={16} /> Nuevo producto</Button>}
+        action={<Link href="/checkout"><Button variant="secondary" className="!bg-white !text-brand"><Plus size={16} /> Nuevo producto</Button></Link>}
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useState } from "react";
 import { Package, AlertTriangle, DollarSign, Boxes, Plus } from "lucide-react";
 import { Hero } from "@/components/ui/Hero";
@@ -42,7 +43,7 @@ export default function Page() {
       <Hero
         title="Buenos días, equipo Retail"
         subtitle="Tienes 18 productos con stock bajo. Las ventas del fin de semana subieron un 12% — momento de reponer."
-        action={<Button variant="secondary" className="!bg-white !text-brand"><Plus size={16} /> Nuevo producto</Button>}
+        action={<Link href="/producto"><Button variant="secondary" className="!bg-white !text-brand"><Plus size={16} /> Nuevo producto</Button></Link>}
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

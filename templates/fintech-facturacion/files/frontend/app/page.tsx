@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useState } from "react";
 import { DollarSign, CheckCircle, AlertCircle, TrendingUp, Plus } from "lucide-react";
 import { Hero } from "@/components/ui/Hero";
@@ -43,7 +44,7 @@ export default function Page() {
       <Hero
         title="Hola de nuevo, equipo Finanzas"
         subtitle="Has facturado $248,500 este mes y cobrado el 73%. Quedan $48,300 por cobrar — ¡vamos por ellos!"
-        action={<Button variant="secondary" className="!bg-white !text-brand"><Plus size={16} /> Nueva factura</Button>}
+        action={<Link href="/factura"><Button variant="secondary" className="!bg-white !text-brand"><Plus size={16} /> Nueva factura</Button></Link>}
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

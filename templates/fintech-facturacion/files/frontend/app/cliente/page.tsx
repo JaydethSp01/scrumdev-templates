@@ -1,75 +1,33 @@
 "use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { CrudTable } from "@/components/ui/CrudTable";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { Card } from "@/components/ui/Card";
-import { DataTable } from "@/components/ui/DataTable";
 import { Badge } from "@/components/ui/Badge";
-import { Avatar } from "@/components/ui/Avatar";
-import { Button } from "@/components/ui/Button";
 
-type Cliente = { nombre: string; email: string; facturado: string; estado: string };
-
-const MOCK: Cliente[] = [
-  { nombre: "Acme Corp", email: "pagos@acme.com", facturado: "$84,200", estado: "Al día" },
-  { nombre: "Globex S.A.", email: "finanzas@globex.com", facturado: "$31,500", estado: "Pendiente" },
-  { nombre: "Initech Ltda.", email: "cuentas@initech.com", facturado: "$15,750", estado: "Moroso" },
-  { nombre: "Soylent Co.", email: "admin@soylent.co", facturado: "$9,400", estado: "Al día" },
-  { nombre: "Umbrella Inc.", email: "billing@umbrella.com", facturado: "$52,300", estado: "Al día" },
-  { nombre: "Stark Industries", email: "pagos@stark.com", facturado: "$67,800", estado: "Pendiente" },
-];
-
-const tone = (e: string) => (e === "Al día" ? "success" : e === "Pendiente" ? "warning" : "danger");
+type Tone = "neutral" | "success" | "warning" | "danger" | "info" | "brand";
+const tones: Record<string, Tone> = { "Al día": "success", Pendiente: "warning", Moroso: "danger" };
+const toneFor = (s: string): Tone => tones[s] ?? "neutral";
 
 export default function Page() {
-  const router = useRouter();
-  const [rows, setRows] = useState(MOCK);
-
   return (
     <div className="space-y-6">
-      <PageHeader
+      <PageHeader title="Clientes" subtitle="Tu cartera de clientes y su comportamiento de pago." />
+      <CrudTable
         title="Clientes"
-        subtitle="Tu cartera de clientes y su comportamiento de pago."
-        action={
-          <Button variant="primary" className="cursor-pointer" onClick={() => router.push("/cliente/create")}>
-            <Plus size={16} /> Nuevo cliente
-          </Button>
-        }
+        fields={[
+          { key: "nombre", label: "Cliente" },
+          { key: "email", label: "Email", type: "email" },
+          { key: "facturado", label: "Facturado", type: "number" },
+          { key: "estado", label: "Estado", render: (r: any) => <Badge tone={toneFor(r.estado)}>{r.estado}</Badge> },
+        ]}
+        initial={[
+          { id: 1, nombre: "Acme Corp", email: "pagos@acme.com", facturado: 84200000, estado: "Al día" },
+          { id: 2, nombre: "Globex S.A.", email: "finanzas@globex.com", facturado: 31500000, estado: "Pendiente" },
+          { id: 3, nombre: "Initech Ltda.", email: "cuentas@initech.com", facturado: 15750000, estado: "Moroso" },
+          { id: 4, nombre: "Soylent Co.", email: "admin@soylent.co", facturado: 9400000, estado: "Al día" },
+          { id: 5, nombre: "Umbrella Inc.", email: "billing@umbrella.com", facturado: 52300000, estado: "Al día" },
+          { id: 6, nombre: "Stark Industries", email: "pagos@stark.com", facturado: 67800000, estado: "Pendiente" },
+        ]}
       />
-      <Card className="!p-0">
-        <DataTable<Cliente>
-          rows={rows}
-          columns={[
-            {
-              key: "nombre", header: "Cliente",
-              render: (r) => (
-                <div className="flex items-center gap-3">
-                  <Avatar name={r.nombre} />
-                  <span className="font-medium text-slate-900">{r.nombre}</span>
-                </div>
-              ),
-            },
-            { key: "email", header: "Email", render: (r) => <span className="text-slate-500">{r.email}</span> },
-            { key: "facturado", header: "Facturado", align: "right", render: (r) => <span className="font-semibold text-slate-900">{r.facturado}</span> },
-            { key: "estado", header: "Estado", render: (r) => <Badge tone={tone(r.estado)}>{r.estado}</Badge> },
-            {
-              key: "acciones", header: "", align: "right",
-              render: (r) => (
-                <div className="flex justify-end gap-1">
-                  <Button variant="ghost" className="cursor-pointer !px-2" onClick={() => router.push("/cliente/create")}>
-                    <Pencil size={15} /> Editar
-                  </Button>
-                  <Button variant="danger" className="cursor-pointer !px-2" onClick={() => setRows((p) => p.filter((x) => x.nombre !== r.nombre))}>
-                    <Trash2 size={15} /> Eliminar
-                  </Button>
-                </div>
-              ),
-            },
-          ]}
-          empty="Aún no tienes clientes registrados."
-        />
-      </Card>
     </div>
   );
 }

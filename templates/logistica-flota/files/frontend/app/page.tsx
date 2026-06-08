@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useState } from "react";
 import { Truck, Navigation, Package, MapPin, Plus } from "lucide-react";
 import { Hero } from "@/components/ui/Hero";
@@ -43,7 +44,7 @@ export default function Page() {
       <Hero
         title="Buenos días, equipo Flota"
         subtitle="142 entregas programadas hoy y 27 envíos en tránsito. Las rutas del norte van adelantadas."
-        action={<Button variant="secondary" className="!bg-white !text-brand"><Plus size={16} /> Nuevo envío</Button>}
+        action={<Link href="/mapa"><Button variant="secondary" className="!bg-white !text-brand"><Plus size={16} /> Nuevo envío</Button></Link>}
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

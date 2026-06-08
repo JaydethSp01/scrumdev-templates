@@ -1,63 +1,34 @@
 "use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { CrudTable } from "@/components/ui/CrudTable";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
-import { Avatar } from "@/components/ui/Avatar";
-import { Button } from "@/components/ui/Button";
-import { DataTable } from "@/components/ui/DataTable";
 
-type Conductor = { nombre: string; licencia: string; zona: string; estado: string };
+type Tone = "neutral" | "success" | "warning" | "danger" | "info" | "brand";
+const tones: Record<string, Tone> = { Disponible: "success", "En ruta": "info", Descanso: "warning" };
+const toneFor = (s: string): Tone => tones[s] ?? "neutral";
 
-const MOCK: Conductor[] = [
-  { nombre: "Juan Pérez", licencia: "B1234567", zona: "Zona Norte", estado: "En ruta" },
-  { nombre: "María López", licencia: "C2345678", zona: "Eje Cafetero", estado: "En ruta" },
-  { nombre: "Carlos García", licencia: "C3456789", zona: "Costa Caribe", estado: "Disponible" },
-  { nombre: "Ana Martínez", licencia: "B4567890", zona: "Zona Oriente", estado: "Disponible" },
-  { nombre: "Diego Torres", licencia: "C5678901", zona: "Zona Sur", estado: "Descanso" },
-  { nombre: "Laura Niño", licencia: "B6789012", zona: "Zona Andina", estado: "En ruta" },
-];
-
-const tone = (e: string) => (e === "Disponible" ? "success" : e === "En ruta" ? "info" : "warning");
-
-export default function ConductorPage() {
-  const router = useRouter();
-  const [rows] = useState(MOCK);
-
-  const columns = [
-    { key: "nombre", header: "Conductor", render: (r: Conductor) => (
-      <div className="flex items-center gap-3">
-        <Avatar name={r.nombre} />
-        <div>
-          <p className="font-medium text-slate-900">{r.nombre}</p>
-          <p className="text-xs text-slate-500">{r.zona}</p>
-        </div>
-      </div>
-    ) },
-    { key: "licencia", header: "Licencia", render: (r: Conductor) => (
-      <span className="font-mono text-slate-700">{r.licencia}</span>
-    ) },
-    { key: "estado", header: "Estado", render: (r: Conductor) => <Badge tone={tone(r.estado)}>{r.estado}</Badge> },
-    { key: "acciones", header: "", align: "right" as const, render: () => (
-      <div className="flex justify-end gap-1">
-        <Button variant="ghost" className="cursor-pointer !px-2"><Pencil size={16} /></Button>
-        <Button variant="ghost" className="cursor-pointer !px-2 text-rose-600"><Trash2 size={16} /></Button>
-      </div>
-    ) },
-  ];
-
+export default function Page() {
   return (
     <div className="space-y-6">
-      <PageHeader
+      <PageHeader title="Conductores" subtitle="Administra el equipo de conductores y su disponibilidad." />
+      <CrudTable
         title="Conductores"
-        subtitle="Administra el equipo de conductores y su disponibilidad."
-        action={<Button className="cursor-pointer" onClick={() => router.push("/conductor/create")}><Plus size={16} /> Nuevo conductor</Button>}
+        fields={[
+          { key: "nombre", label: "Conductor" },
+          { key: "licencia", label: "Licencia" },
+          { key: "zona", label: "Zona" },
+          { key: "telefono", label: "Teléfono" },
+          { key: "estado", label: "Estado", render: (r: any) => <Badge tone={toneFor(r.estado)}>{r.estado}</Badge> },
+        ]}
+        initial={[
+          { id: 1, nombre: "Juan Pérez", licencia: "B1234567", zona: "Zona Norte", telefono: "+57 300 111 2233", estado: "En ruta" },
+          { id: 2, nombre: "María López", licencia: "C2345678", zona: "Eje Cafetero", telefono: "+57 311 444 5566", estado: "En ruta" },
+          { id: 3, nombre: "Carlos García", licencia: "C3456789", zona: "Costa Caribe", telefono: "+57 320 777 8899", estado: "Disponible" },
+          { id: 4, nombre: "Ana Martínez", licencia: "B4567890", zona: "Zona Oriente", telefono: "+57 301 222 3344", estado: "Disponible" },
+          { id: 5, nombre: "Diego Torres", licencia: "C5678901", zona: "Zona Sur", telefono: "+57 315 555 6677", estado: "Descanso" },
+          { id: 6, nombre: "Laura Niño", licencia: "B6789012", zona: "Zona Andina", telefono: "+57 318 888 9900", estado: "En ruta" },
+        ]}
       />
-      <Card className="!p-0">
-        <DataTable columns={columns} rows={rows} empty="Sin conductores registrados." />
-      </Card>
     </div>
   );
 }
