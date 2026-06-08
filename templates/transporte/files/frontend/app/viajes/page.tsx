@@ -1,0 +1,5 @@
+"use client";
+import { CrudTable } from "@/components/ui/CrudTable";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Badge } from "@/components/ui/Badge";
+export default function Page(){return(<div className="space-y-6"><PageHeader title="Viajes" subtitle="Carreras y su estado en tiempo real." /><CrudTable title="Viajes" fields={[{key:"origen",label:"Origen"},{key:"destino",label:"Destino"},{key:"conductor",label:"Conductor"},{key:"tarifa",label:"Tarifa",type:"number",render:(r:any)=>"$"+Number(r.tarifa||0).toLocaleString("es-CO")},{key:"estado",label:"Estado",render:(r:any)=><Badge tone={r.estado==="Finalizado"?"success":r.estado==="En ruta"?"info":"warning"}>{r.estado}</Badge>}]} initial={[{id:1,origen:"Centro",destino:"Aeropuerto",conductor:"Carlos Pérez",tarifa:45000,estado:"En ruta"},{id:2,origen:"Norte",destino:"Sur",conductor:"Ana Gómez",tarifa:18000,estado:"Esperando"},{id:3,origen:"Poblado",destino:"Centro",conductor:"Luis Mora",tarifa:15000,estado:"Finalizado"}]} /></div>);}
