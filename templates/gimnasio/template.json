@@ -1,0 +1,6 @@
+{
+  "id": "gimnasio",
+  "name": "FitGym",
+  "sector": "gimnasio",
+  "description": "Gestión de gimnasio: miembros, membresías, clases, rutinas y pagos."
+}

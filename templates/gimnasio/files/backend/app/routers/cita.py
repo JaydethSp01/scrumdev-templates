@@ -1,0 +1,1 @@
+from fastapi import APIRouter; router = APIRouter(prefix='/citas', tags=['citas']); @router.get('/') async def list_citas(): return [{'id': 1, 'nombre': 'Consulta General', 'estado': 'Confirmada'}, {'id': 2, 'nombre': 'Revisión', 'estado': 'Pendiente'}];

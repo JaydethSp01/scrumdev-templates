@@ -1,0 +1,1 @@
+from fastapi import APIRouter; router = APIRouter(prefix='/especialidades', tags=['especialidades']); @router.get('/') async def list_especialidades(): return [{'id': 1, 'nombre': 'Cardiología'}, {'id': 2, 'nombre': 'Dermatología'}];
