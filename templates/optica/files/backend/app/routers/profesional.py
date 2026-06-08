@@ -1,0 +1,1 @@
+from fastapi import APIRouter; router = APIRouter(prefix='/profesionales', tags=['profesionales']); @router.get('/') async def list_profesionales(): return [{'id': 1, 'nombre': 'Dr. Lopez'}, {'id': 2, 'nombre': 'Dra. Martinez'}];

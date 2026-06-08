@@ -1,0 +1,30 @@
+{
+  "id": "ferreteria",
+  "name": "FerrePro",
+  "sector": "ferreteria",
+  "sector_label": "Ferretería",
+  "software_type": "saas_crud",
+  "stack": "nextjs-fastapi-postgres",
+  "description": "Gestión de ferretería: productos, ventas, inventario, clientes y proveedores.",
+  "entities": [
+    "producto",
+    "venta",
+    "inventario",
+    "cliente",
+    "proveedor"
+  ],
+  "brand_color": "#ea580c",
+  "tags": [
+    "ferreteria",
+    "productos",
+    "ventas",
+    "inventario",
+    "clientes",
+    "proveedores",
+    "stock"
+  ],
+  "accent": "",
+  "has_files": false,
+  "preview_url": "https://raw.githubusercontent.com/JaydethSp01/scrumdev-templates/main/templates/ferreteria/preview.png",
+  "seeded_at": "2026-06-08"
+}
